@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{1078756E-59E7-479C-B7EC-053630597585}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{82c4dc8a-e573-4c65-8cbc-a1dc0a79f9e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Input">
+      <UniqueIdentifier>{57f35d2b-95d3-46bb-aac2-21a3206292a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Input">
+      <UniqueIdentifier>{92de21e8-47f4-4144-b961-0fe9b9238de1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Region">
+      <UniqueIdentifier>{b5e11f95-b5bf-4c87-ba2f-32a69738df3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Region">
+      <UniqueIdentifier>{B87F8C38-8151-478E-9D5D-2583FBC666CC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Utility">
+      <UniqueIdentifier>{6B530C10-6FF9-49E2-A61A-3189469E90F3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Utility">
+      <UniqueIdentifier>{7ec4ab83-930a-43c5-b9b5-8b7de1ca40a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime">
+      <UniqueIdentifier>{1f91fe59-84c2-4472-9d80-b8a65fe563f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Runtime">
+      <UniqueIdentifier>{5078a368-1a3b-4217-a118-b9337d585f4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Model">
+      <UniqueIdentifier>{90C755D7-86FD-4C77-9A52-A33BCE2D7B7F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Model">
+      <UniqueIdentifier>{796C4628-3F6A-442E-94DA-77D3B465F592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Audio">
+      <UniqueIdentifier>{0fbe06d8-f91d-4a51-b74d-46210b31a904}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Audio">
+      <UniqueIdentifier>{4c89b08c-7d9c-4d7e-8394-3e85be62f434}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Image">
+      <UniqueIdentifier>{124cc97d-dfe3-4397-8e4e-4ca69ec9aeb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Chart">
+      <UniqueIdentifier>{9bfc4ac9-a8f2-4cec-bbcc-429590116afb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Chart">
+      <UniqueIdentifier>{853f9bee-7ff0-4109-841c-c45d7ba850d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Image">
+      <UniqueIdentifier>{3f904f5c-864c-41d9-958c-bd376b927158}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Piko FileTypes">
+      <UniqueIdentifier>{3ac398b5-7d18-408f-909d-f75365487416}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Piko FileTypes">
+      <UniqueIdentifier>{c630b7b0-9891-4ace-989a-32bab172db66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Piko ThirdParty">
+      <UniqueIdentifier>{B42E4332-6C99-4CF7-B77B-40D44A7CE71A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Piko ThirdParty">
+      <UniqueIdentifier>{05584827-130B-4AE5-A5D0-FC64CB6747FD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Piko Utils">
+      <UniqueIdentifier>{AA3D5B7F-25D4-4E54-8D5F-5DCACAA87C0D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Piko Utils">
+      <UniqueIdentifier>{E4C3B7D2-3EC4-4D83-BE4A-C8C1AD273A42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Video">
+      <UniqueIdentifier>{1A1D34B5-8B4B-4A23-98B4-BC2EF49B54A7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Video">
+      <UniqueIdentifier>{D46213CE-3673-4B43-A498-A98401459BFA}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Input\IGameSource.hpp"><Filter>Header\Input</Filter></ClInclude>
+    <ClInclude Include="Input\FolderSource.hpp"><Filter>Header\Input</Filter></ClInclude>
+    <ClInclude Include="Input\Iso9660Source.hpp"><Filter>Header\Input</Filter></ClInclude>
+    <ClInclude Include="Input\SourceFactory.hpp"><Filter>Header\Input</Filter></ClInclude>
+    <ClInclude Include="Utility\JsonUtil.hpp"><Filter>Header\Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\PathNormalize.hpp"><Filter>Header\Utility</Filter></ClInclude>
+    <ClInclude Include="Utility\ProcessUtil.hpp"><Filter>Header\Utility</Filter></ClInclude>
+    <ClInclude Include="Region\SourceScanner.hpp"><Filter>Header\Region</Filter></ClInclude>
+    <ClInclude Include="Runtime\RuntimeBuilder.hpp"><Filter>Header\Runtime</Filter></ClInclude>
+    <ClInclude Include="Model\XgGltfConverter.hpp"><Filter>Header\Model</Filter></ClInclude>
+    <ClInclude Include="Model\GmoGltfConverter.hpp"><Filter>Header\Model</Filter></ClInclude>
+    <ClInclude Include="Model\GltfUtil.hpp"><Filter>Header\Model</Filter></ClInclude>
+    <ClInclude Include="Audio\WavWriter.hpp"><Filter>Header\Audio</Filter></ClInclude>
+    <ClInclude Include="Image\ImageConverter.hpp"><Filter>Header\Image</Filter></ClInclude>
+    <ClInclude Include="Image\GimConverter.hpp"><Filter>Header\Image</Filter></ClInclude>
+    <ClInclude Include="Audio\ImcConverter.hpp"><Filter>Header\Audio</Filter></ClInclude>
+    <ClInclude Include="Audio\PspAtracConverter.hpp"><Filter>Header\Audio</Filter></ClInclude>
+    <ClInclude Include="Video\PssConverter.hpp"><Filter>Header\Video</Filter></ClInclude>
+    <ClInclude Include="Chart\ChcJsonWriter.hpp"><Filter>Header\Chart</Filter></ClInclude>
+    <ClInclude Include="Image\PngWriter.hpp"><Filter>Header\Image</Filter></ClInclude>
+    <ClInclude Include="..\Piko\FileTypes\CHC\CHC.hpp"><Filter>Header\Piko FileTypes</Filter></ClInclude>
+    <ClInclude Include="..\Piko\FileTypes\IMC\IMC.hpp"><Filter>Header\Piko FileTypes</Filter></ClInclude>
+    <ClInclude Include="..\Piko\FileTypes\IMX\IMX.hpp"><Filter>Header\Piko FileTypes</Filter></ClInclude>
+    <ClInclude Include="..\Piko\FileTypes\XGM\XGM.hpp"><Filter>Header\Piko FileTypes</Filter></ClInclude>
+    <ClInclude Include="..\Piko\FileTypes\XG\XG.hpp"><Filter>Header\Piko FileTypes</Filter></ClInclude>
+    <ClInclude Include="..\Piko\FileTypes\GMO\GMO.hpp"><Filter>Header\Piko FileTypes</Filter></ClInclude>
+    <ClInclude Include="..\Piko\FileTypes\SSQ\SSQ.hpp"><Filter>Header\Piko FileTypes</Filter></ClInclude>
+    <ClInclude Include="..\Piko\FileTypes\SSQ\SSQJson.hpp"><Filter>Header\Piko FileTypes</Filter></ClInclude>
+    <ClInclude Include="..\Piko\ThirdParty\TinyGLTFConfig.hpp"><Filter>Header\Piko ThirdParty</Filter></ClInclude>
+    <ClInclude Include="..\Piko\Utils\BinaryUtil.hpp"><Filter>Header\Piko Utils</Filter></ClInclude>
+    <ClInclude Include="..\Piko\Utils\StrUtil.hpp"><Filter>Header\Piko Utils</Filter></ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp"><Filter>Source</Filter></ClCompile>
+    <ClCompile Include="Input\FolderSource.cpp"><Filter>Source\Input</Filter></ClCompile>
+    <ClCompile Include="Input\Iso9660Source.cpp"><Filter>Source\Input</Filter></ClCompile>
+    <ClCompile Include="Input\SourceFactory.cpp"><Filter>Source\Input</Filter></ClCompile>
+    <ClCompile Include="Utility\JsonUtil.cpp"><Filter>Source\Utility</Filter></ClCompile>
+    <ClCompile Include="Utility\PathNormalize.cpp"><Filter>Source\Utility</Filter></ClCompile>
+    <ClCompile Include="Utility\ProcessUtil.cpp"><Filter>Source\Utility</Filter></ClCompile>
+    <ClCompile Include="Region\SourceScanner.cpp"><Filter>Source\Region</Filter></ClCompile>
+    <ClCompile Include="Runtime\RuntimeBuilder.cpp"><Filter>Source\Runtime</Filter></ClCompile>
+    <ClCompile Include="Model\XgGltfConverter.cpp"><Filter>Source\Model</Filter></ClCompile>
+    <ClCompile Include="Model\GmoGltfConverter.cpp"><Filter>Source\Model</Filter></ClCompile>
+    <ClCompile Include="Model\GltfUtil.cpp"><Filter>Source\Model</Filter></ClCompile>
+    <ClCompile Include="Audio\WavWriter.cpp"><Filter>Source\Audio</Filter></ClCompile>
+    <ClCompile Include="Audio\ImcConverter.cpp"><Filter>Source\Audio</Filter></ClCompile>
+    <ClCompile Include="Audio\PspAtracConverter.cpp"><Filter>Source\Audio</Filter></ClCompile>
+    <ClCompile Include="Video\PssConverter.cpp"><Filter>Source\Video</Filter></ClCompile>
+    <ClCompile Include="Chart\ChcJsonWriter.cpp"><Filter>Source\Chart</Filter></ClCompile>
+    <ClCompile Include="Image\ImageConverter.cpp"><Filter>Source\Image</Filter></ClCompile>
+    <ClCompile Include="Image\GimConverter.cpp"><Filter>Source\Image</Filter></ClCompile>
+    <ClCompile Include="Image\PngWriter.cpp"><Filter>Source\Image</Filter></ClCompile>
+    <ClCompile Include="..\Piko\FileTypes\CHC\CHC.cpp"><Filter>Source\Piko FileTypes</Filter></ClCompile>
+    <ClCompile Include="..\Piko\FileTypes\AlbumDef\AlbumDef.cpp"><Filter>Source\Piko FileTypes</Filter></ClCompile>
+    <ClCompile Include="..\Piko\FileTypes\IMC\IMC.cpp"><Filter>Source\Piko FileTypes</Filter></ClCompile>
+    <ClCompile Include="..\Piko\FileTypes\IMX\IMX.cpp"><Filter>Source\Piko FileTypes</Filter></ClCompile>
+    <ClCompile Include="..\Piko\FileTypes\XGM\XGM.cpp"><Filter>Source\Piko FileTypes</Filter></ClCompile>
+    <ClCompile Include="..\Piko\FileTypes\XG\XG.cpp"><Filter>Source\Piko FileTypes</Filter></ClCompile>
+    <ClCompile Include="..\Piko\FileTypes\GMO\GMO.cpp"><Filter>Source\Piko FileTypes</Filter></ClCompile>
+    <ClCompile Include="..\Piko\FileTypes\SSQ\SSQ.cpp"><Filter>Source\Piko FileTypes</Filter></ClCompile>
+    <ClCompile Include="..\Piko\FileTypes\SSQ\SSQJson.cpp"><Filter>Source\Piko FileTypes</Filter></ClCompile>
+    <ClCompile Include="..\Piko\ThirdParty\TinyGLTF.cpp"><Filter>Source\Piko ThirdParty</Filter></ClCompile>
+    <ClCompile Include="..\Piko\Utils\BinaryUtil.cpp"><Filter>Source\Piko Utils</Filter></ClCompile>
+    <ClCompile Include="..\Piko\Utils\StrUtil.cpp"><Filter>Source\Piko Utils</Filter></ClCompile>
+    <ClCompile Include="..\Piko\Runtime\Audio\Pcm16.cpp"><Filter>Source\Piko Utils</Filter></ClCompile>
+    <ClCompile Include="..\Piko\Rendering\RenderUtil.cpp"><Filter>Source\Piko Utils</Filter></ClCompile>
+  </ItemGroup>
+</Project>

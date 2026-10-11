@@ -1,0 +1,48 @@
+BasedOnStyle: Microsoft
+Language: Cpp
+Standard: c++20
+IndentWidth: 4
+ContinuationIndentWidth: 4
+UseTab: Never
+ColumnLimit: 120
+BreakBeforeBraces: Allman
+InsertBraces: true
+AllowShortBlocksOnASingleLine: Never
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortLambdasOnASingleLine: None
+AllowShortCaseLabelsOnASingleLine: false
+IndentCaseLabels: true
+NamespaceIndentation: All
+FixNamespaceComments: false
+AccessModifierOffset: -4
+AlignAfterOpenBracket: false
+Cpp11BracedListStyle: FunctionCall
+PointerAlignment: Right
+ReferenceAlignment: Right
+SpaceBeforeParens: Never
+SpacesInParens: Custom
+SpacesInParensOptions:
+  InConditionalStatements: true
+  InEmptyParentheses: false
+  Other: true
+SpacesInSquareBrackets: true
+SpaceBeforeCpp11BracedList: false
+BinPackArguments: false
+BinPackParameters: false
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+BreakStringLiterals: false
+SortIncludes: Never
+SortUsingDeclarations: Never
+IncludeBlocks: Preserve
+SeparateDefinitionBlocks: Always
+MaxEmptyLinesToKeep: 1
+# Separate independent operations with blank lines; keep paired updates together.
+# Fixed class constants belong in headers as static constexpr members.
+# Tools/FormatCode.py enforces array rows and spacing after clang-format.
+# Owned signed integer declarations use std::int32_t; retain the standard main signature.
+BreakAfterOpenBracketBracedList: true
+BreakBeforeCloseBracketBracedList: true
+BinPackLongBracedList: false

@@ -1,0 +1,77 @@
+{
+    "stages": [
+        {
+            "stage": 1,
+            "songs": [
+                { "key": "@song.twisted_reality", "title": "Twisted Reality" }
+            ]
+        },
+        {
+            "stage": 2,
+            "songs": [
+                { "key": "@song.flyin_to_your_heart", "title": "Flyin' To Your Heart" }
+            ]
+        },
+        {
+            "stage": 3,
+            "songs": [
+                { "key": "@song.bee_jam_blues", "title": "'Bee' Jam Blues" }
+            ]
+        },
+        {
+            "stage": 4,
+            "songs": [
+                { "key": "@song.void", "title": "VOID" }
+            ]
+        },
+        {
+            "stage": 5,
+            "songs": [
+                { "key": "@song.nuff_respect", "title": "Nuff Respect (featuring NAHKI)" }
+            ]
+        },
+        {
+            "stage": 6,
+            "songs": [
+                { "key": "@song.legendary_theme_acoustic", "title": "The Legendary Theme (Acoustic Version)" }
+            ]
+        },
+        {
+            "stage": 7,
+            "songs": [
+                { "key": "@song.born_to_be_bone", "title": "Born To Be Bone" }
+            ]
+        },
+        {
+            "stage": 8,
+            "songs": [
+                { "key": "@song.tainted_lovers", "title": "Tainted Lovers" }
+            ]
+        },
+        {
+            "stage": 9,
+            "songs": [
+                { "key": "@song.overpass", "title": "Overpass" },
+                { "key": "@song.legendary_theme_album", "title": "The Legendary Theme (Album Version)" }
+            ]
+        },
+        {
+            "stage": 10,
+            "songs": [
+                { "key": "@song.resurrection", "title": "Resurrection" }
+            ]
+        },
+        {
+            "stage": 11,
+            "songs": [
+                { "key": "@song.metal_header", "title": "Metal Header" }
+            ]
+        },
+        {
+            "stage": 12,
+            "songs": [
+                { "key": "@song.toda_pasion", "title": "Toda Pasión" }
+            ]
+        }
+    ]
+}

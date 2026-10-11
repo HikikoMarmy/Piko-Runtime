@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "vertex_shader": "shaders/title_topology.vert",
+  "fragment_shader": "shaders/title_topology.frag",
+
+  "base_color": [0.54, 0.80, 1.00],
+  "fill_color": [0.72, 0.92, 1.00],
+  "line_color": [0.88, 0.98, 1.00],
+
+  "speed": 0.055,
+  "contour_scale": 2.35,
+  "contour_count": 13.0,
+  "line_width": 0.050,
+  "line_softness": 0.020,
+  "line_alpha": 0.56,
+  "glow": 0.30,
+  "vignette": 0.18,
+  "grain": 0.020
+}

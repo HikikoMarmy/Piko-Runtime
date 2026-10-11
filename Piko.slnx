@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Piko/Piko.vcxproj" Id="d119af64-d500-4cb0-8c2d-099aaf534676" />
+  <Project Path="Convert/Convert.vcxproj" Id="8a7d8d8d-0d1c-49b1-a6f5-41f651f5f10a">
+    <Build Solution="*|x86" Project="false" />
+  </Project>
+</Solution>

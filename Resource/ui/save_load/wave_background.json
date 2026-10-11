@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "vertex_shader": "shaders/fullscreen.vert",
+  "fragment_shader": "shaders/stage_select_waves.frag",
+  "band_colors": [
+    [0.980, 0.682, 0.180],
+    [0.980, 0.667, 0.380],
+    [0.984, 0.741, 0.431],
+    [0.980, 0.682, 0.180]
+  ],
+  "speed": 0.18
+}

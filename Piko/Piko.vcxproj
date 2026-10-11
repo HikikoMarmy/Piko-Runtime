@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{d119af64-d500-4cb0-8c2d-099aaf534676}</ProjectGuid>
+    <RootNamespace>Piko</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <VcpkgEnabled>false</VcpkgEnabled>
+    <VcpkgApplocalDeps>false</VcpkgApplocalDeps>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Build\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Build\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir);../Convert;../External/SDL/Include;../External/glad/include;../External/imgui;../External/imgui/backends;../External/tinygltf;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../External/SDL/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL3.lib;opengl32.lib;mfplat.lib;mfreadwrite.lib;mfuuid.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir);../Convert;../External/SDL/Include;../External/glad/include;../External/imgui;../External/imgui/backends;../External/tinygltf;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../External/SDL/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL3.lib;opengl32.lib;mfplat.lib;mfreadwrite.lib;mfuuid.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\External\glad\src\gl.c" />
+    <ClCompile Include="..\External\imgui\backends\imgui_impl_opengl3.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\backends\imgui_impl_sdl3.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\imgui.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\imgui_draw.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\imgui_tables.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\imgui_widgets.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="App\main.cpp" />
+    <ClCompile Include="Localization\Language.cpp" />
+    <ClCompile Include="Localization\LabelTexture.cpp" />
+    <ClCompile Include="App\piko.cpp" />
+    <ClCompile Include="FileTypes\IMX\IMX.cpp" />
+    <ClCompile Include="FileTypes\AlbumDef\AlbumDef.cpp" />
+    <ClCompile Include="FileTypes\CHC\CHC.cpp" />
+    <ClCompile Include="FileTypes\CHC\CHCJson.cpp" />
+    <ClCompile Include="FileTypes\IMC\IMC.cpp" />
+    <ClCompile Include="FileTypes\GMO\GMO.cpp" />
+    <ClCompile Include="GameData\GameDataRoot.cpp" />
+    <ClCompile Include="GameData\SaveData.cpp" />
+    <ClCompile Include="GameData\StageCatalog.cpp" />
+    <ClCompile Include="GameData\RuntimeImporter.cpp" />
+    <ClCompile Include="GameData\AlbumFlow.cpp" />
+    <ClCompile Include="FileTypes\XGM\XGM.cpp" />
+    <ClCompile Include="FileTypes\XG\XG.cpp" />
+    <ClCompile Include="FileTypes\SSQ\SSQ.cpp" />
+    <ClCompile Include="FileTypes\SSQ\SSQJson.cpp" />
+    <ClCompile Include="Managers\AudioManager.cpp" />
+    <ClCompile Include="Managers\FrameStats.cpp" />
+    <ClCompile Include="Managers\GameSettings.cpp" />
+    <ClCompile Include="Managers\InputManager.cpp" />
+    <ClCompile Include="Managers\TextureManager.cpp" />
+    <ClCompile Include="Modules\Import\ImportModule.cpp" />
+    <ClCompile Include="Modules\Loading\LoadingModule.cpp" />
+    <ClCompile Include="Modules\Collection\CollectionModule.cpp" />
+    <ClCompile Include="Modules\MainMenu\MainMenuModule.cpp" />
+    <ClCompile Include="Modules\PikoModule.cpp" />
+    <ClCompile Include="Modules\MainMenu\TitleBackgroundRenderer.cpp" />
+    <ClCompile Include="Modules\MainMenu\TitleScreenBackdrop.cpp" />
+    <ClCompile Include="Modules\Options\OptionsModule.cpp" />
+    <ClCompile Include="Modules\Options\GameplayVisualModule.cpp" />
+    <ClCompile Include="Modules\Options\GameModifiersModule.cpp" />
+    <ClCompile Include="Modules\Movie\MovieModule.cpp" />
+    <ClCompile Include="Modules\Result\ResultModule.cpp" />
+    <ClCompile Include="Modules\SaveLoad\SaveLoadModule.cpp" />
+    <ClCompile Include="Modules\Stage\StageTutorialRenderer.cpp" />
+    <ClCompile Include="Runtime\Stage\StageTutorialTimeline.cpp" />
+    <ClCompile Include="Runtime\Stage\StageTutorialData.cpp" />
+    <ClCompile Include="Modules\Stage\StageModule.cpp" />
+    <ClCompile Include="Modules\Stage\Stage3DRenderer.cpp" />
+    <ClCompile Include="Modules\Stage\Stage3DUtil.cpp" />
+    <ClCompile Include="Modules\Stage\StageDebugHud.cpp" />
+    <ClCompile Include="Utils\BattleTexturePixels.cpp" />
+    <ClCompile Include="Modules\Stage\StageGeneratedTextures.cpp" />
+    <ClCompile Include="Modules\Stage\StageGuardRenderer.cpp" />
+    <ClCompile Include="Modules\Stage\StageModuleRendering.cpp" />
+    <ClCompile Include="Modules\Stage\StagePhraseRenderer.cpp" />
+    <ClCompile Include="Modules\Stage\StageRibbonRenderer.cpp" />
+    <ClCompile Include="Modules\Stage\StageTraceRenderer.cpp" />
+    <ClCompile Include="Modules\StageSelect\StageSelectModule.cpp" />
+    <ClCompile Include="Runtime\Stage\StageConditionResolver.cpp" />
+    <ClCompile Include="Runtime\Stage\StagePlayerState.cpp" />
+    <ClCompile Include="Runtime\Stage\StageRuntime.cpp" />
+    <ClCompile Include="Runtime\Stage\StageInstrumentState.cpp" />
+    <ClCompile Include="Runtime\Stage\ResultAtlas.cpp" />
+    <ClCompile Include="Runtime\Stage\StageHudModel.cpp" />
+    <ClCompile Include="Runtime\Movie\MediaFoundationMoviePlayer.cpp" />
+    <ClCompile Include="Runtime\Stage\StageAudioController.cpp" />
+    <ClCompile Include="Runtime\Stage\StageTraceBuilder.cpp" />
+    <ClCompile Include="Runtime\Stage\StageView.cpp" />
+    <ClCompile Include="Runtime\Stage\StageViewUtil.cpp" />
+    <ClCompile Include="Runtime\Audio\Pcm16.cpp" />
+    <ClCompile Include="Runtime\Model\GltfDocument.cpp" />
+    <ClCompile Include="Runtime\Model\GltfModel.cpp" />
+    <ClCompile Include="ThirdParty\TinyGLTF.cpp" />
+    <ClCompile Include="Rendering\Renderer.cpp" />
+    <ClCompile Include="Rendering\RenderTypes.cpp" />
+    <ClCompile Include="Rendering\RenderUtil.cpp" />
+    <ClCompile Include="Rendering\TrueTypeText.cpp" />
+    <ClCompile Include="Rendering\Shader.cpp" />
+    <ClCompile Include="Utils\Json.cpp" />
+    <ClCompile Include="Utils\BinaryUtil.cpp" />
+    <ClCompile Include="Utils\FileUtil.cpp" />
+    <ClCompile Include="Utils\MathUtil.cpp" />
+    <ClCompile Include="Utils\StrUtil.cpp" />
+    <ClCompile Include="..\Convert\Audio\ImcConverter.cpp" />
+    <ClCompile Include="..\Convert\Audio\PspAtracConverter.cpp" />
+    <ClCompile Include="..\Convert\Audio\WavWriter.cpp" />
+    <ClCompile Include="..\Convert\Video\PssConverter.cpp" />
+    <ClCompile Include="..\Convert\Chart\ChcJsonWriter.cpp" />
+    <ClCompile Include="..\Convert\Image\ImageConverter.cpp" />
+    <ClCompile Include="..\Convert\Image\GimConverter.cpp" />
+    <ClCompile Include="..\Convert\Image\PngWriter.cpp" />
+    <ClCompile Include="..\Convert\Input\FolderSource.cpp" />
+    <ClCompile Include="..\Convert\Input\Iso9660Source.cpp" />
+    <ClCompile Include="..\Convert\Input\SourceFactory.cpp" />
+    <ClCompile Include="..\Convert\Region\SourceScanner.cpp" />
+    <ClCompile Include="..\Convert\Runtime\RuntimeBuilder.cpp" />
+    <ClCompile Include="..\Convert\Model\XgGltfConverter.cpp" />
+    <ClCompile Include="..\Convert\Model\GmoGltfConverter.cpp" />
+    <ClCompile Include="..\Convert\Utility\PathNormalize.cpp" />
+    <ClCompile Include="..\Convert\Utility\JsonUtil.cpp" />
+    <ClCompile Include="..\Convert\Utility\ProcessUtil.cpp" />
+    <ClCompile Include="..\Convert\Model\GltfUtil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Localization\Language.hpp" />
+    <ClInclude Include="Localization\LabelTexture.hpp" />
+    <ClInclude Include="App\piko.hpp" />
+    <ClInclude Include="FileTypes\IMX\IMX.hpp" />
+    <ClInclude Include="FileTypes\AlbumDef\AlbumDef.hpp" />
+    <ClInclude Include="FileTypes\CHC\CHC.hpp" />
+    <ClInclude Include="FileTypes\CHC\CHCJson.hpp" />
+    <ClInclude Include="FileTypes\IMC\IMC.hpp" />
+    <ClInclude Include="FileTypes\GMO\GMO.hpp" />
+    <ClInclude Include="FileTypes\XGM\XGM.hpp" />
+    <ClInclude Include="FileTypes\XG\XG.hpp" />
+    <ClInclude Include="FileTypes\SSQ\SSQ.hpp" />
+    <ClInclude Include="FileTypes\SSQ\SSQJson.hpp" />
+    <ClInclude Include="GameData\GameDataRoot.hpp" />
+    <ClInclude Include="GameData\SaveData.hpp" />
+    <ClInclude Include="GameData\StageCatalog.hpp" />
+    <ClInclude Include="GameData\RuntimeImporter.hpp" />
+    <ClInclude Include="GameData\AlbumFlow.hpp" />
+    <ClInclude Include="Managers\AudioManager.hpp" />
+    <ClInclude Include="Managers\FrameStats.hpp" />
+    <ClInclude Include="Managers\GameSettings.hpp" />
+    <ClInclude Include="Managers\MenuNavigation.hpp" />
+    <ClInclude Include="Managers\InterfaceStyle.hpp" />
+    <ClInclude Include="Managers\InputManager.hpp" />
+    <ClInclude Include="Managers\TextureManager.hpp" />
+    <ClInclude Include="Modules\Import\ImportModule.hpp" />
+    <ClInclude Include="Modules\Loading\LoadingModule.hpp" />
+    <ClInclude Include="Modules\Collection\CollectionModule.hpp" />
+    <ClInclude Include="Modules\MainMenu\MainMenuAtlas.hpp" />
+    <ClInclude Include="Modules\MainMenu\MainMenuModule.hpp" />
+    <ClInclude Include="Modules\MainMenu\TitleBackgroundRenderer.hpp" />
+    <ClInclude Include="Modules\MainMenu\TitleScreenBackdrop.hpp" />
+    <ClInclude Include="Modules\Options\OptionsModule.hpp" />
+    <ClInclude Include="Modules\Options\GameplayVisualModule.hpp" />
+    <ClInclude Include="Modules\Options\GameModifiersModule.hpp" />
+    <ClInclude Include="Modules\Movie\MovieModule.hpp" />
+    <ClInclude Include="Modules\Result\ResultModule.hpp" />
+    <ClInclude Include="Modules\SaveLoad\SaveLoadModule.hpp" />
+    <ClInclude Include="Modules\Stage\StageTutorialRenderer.hpp" />
+    <ClInclude Include="Runtime\Stage\StageTutorialTimeline.hpp" />
+    <ClInclude Include="Runtime\Stage\StageTutorialData.hpp" />
+    <ClInclude Include="Modules\Stage\StageModule.hpp" />
+    <ClInclude Include="Modules\Stage\Stage3DRenderer.hpp" />
+    <ClInclude Include="Modules\Stage\Stage3DUtil.hpp" />
+    <ClInclude Include="Modules\Stage\StageModuleRendering.hpp" />
+    <ClInclude Include="Modules\Stage\StageModuleConstants.hpp" />
+    <ClInclude Include="Utils\BattleTexturePixels.hpp" />
+    <ClInclude Include="Modules\Stage\StageGeneratedTextures.hpp" />
+    <ClInclude Include="Modules\Stage\StageDebugHud.hpp" />
+    <ClInclude Include="Modules\Stage\StageRibbonRenderer.hpp" />
+    <ClInclude Include="Modules\Stage\StageTraceRenderer.hpp" />
+    <ClInclude Include="Modules\Stage\StagePhraseRenderer.hpp" />
+    <ClInclude Include="Modules\Stage\StageGuardRenderer.hpp" />
+    <ClInclude Include="Modules\StageSelect\StageSelectModule.hpp" />
+    <ClInclude Include="Utils\EnumUtil.hpp" />
+    <ClInclude Include="Utils\Json.hpp" />
+    <ClInclude Include="Utils\BinaryUtil.hpp" />
+    <ClInclude Include="Utils\FileUtil.hpp" />
+    <ClInclude Include="Utils\MathUtil.hpp" />
+    <ClInclude Include="Utils\StrUtil.hpp" />
+    <ClInclude Include="..\Convert\Audio\ImcConverter.hpp" />
+    <ClInclude Include="..\Convert\Audio\PspAtracConverter.hpp" />
+    <ClInclude Include="..\Convert\Audio\WavWriter.hpp" />
+    <ClInclude Include="..\Convert\Video\PssConverter.hpp" />
+    <ClInclude Include="..\Convert\Chart\ChcJsonWriter.hpp" />
+    <ClInclude Include="..\Convert\Image\ImageConverter.hpp" />
+    <ClInclude Include="..\Convert\Image\GimConverter.hpp" />
+    <ClInclude Include="..\Convert\Image\PngWriter.hpp" />
+    <ClInclude Include="..\Convert\Input\FolderSource.hpp" />
+    <ClInclude Include="..\Convert\Input\IGameSource.hpp" />
+    <ClInclude Include="..\Convert\Input\Iso9660Source.hpp" />
+    <ClInclude Include="..\Convert\Input\SourceFactory.hpp" />
+    <ClInclude Include="..\Convert\Region\SourceScanner.hpp" />
+    <ClInclude Include="..\Convert\Runtime\RuntimeBuilder.hpp" />
+    <ClInclude Include="..\Convert\Model\XgGltfConverter.hpp" />
+    <ClInclude Include="..\Convert\Model\GmoGltfConverter.hpp" />
+    <ClInclude Include="..\Convert\Utility\PathNormalize.hpp" />
+    <ClInclude Include="..\Convert\Utility\JsonUtil.hpp" />
+    <ClInclude Include="..\Convert\Utility\ProcessUtil.hpp" />
+    <ClInclude Include="..\Convert\Model\GltfUtil.hpp" />
+    <ClInclude Include="Modules\PikoModule.hpp" />
+    <ClInclude Include="Runtime\Stage\StageConditionResolver.hpp" />
+    <ClInclude Include="Runtime\Stage\StageGameplayInterfaceAtlas.hpp" />
+    <ClInclude Include="Runtime\Stage\ResultAtlas.hpp" />
+    <ClInclude Include="Runtime\Stage\StagePlayerState.hpp" />
+    <ClInclude Include="Runtime\Stage\StageRuntime.hpp" />
+    <ClInclude Include="Runtime\Stage\StageInstrumentState.hpp" />
+    <ClInclude Include="Runtime\Stage\StageResultData.hpp" />
+    <ClInclude Include="Runtime\Stage\StageHudModel.hpp" />
+    <ClInclude Include="Runtime\Audio\Pcm16.hpp" />
+    <ClInclude Include="Runtime\Audio\InstrumentAudio.hpp" />
+    <ClInclude Include="Runtime\Audio\InstrumentPlayback.hpp" />
+    <ClInclude Include="Runtime\Movie\MediaFoundationMoviePlayer.hpp" />
+    <ClInclude Include="Runtime\Stage\StageAudioController.hpp" />
+    <ClInclude Include="Runtime\Stage\StageTraceBuilder.hpp" />
+    <ClInclude Include="Runtime\Stage\StageView.hpp" />
+    <ClInclude Include="Runtime\Stage\StageViewUtil.hpp" />
+    <ClInclude Include="Runtime\Model\GltfDocument.hpp" />
+    <ClInclude Include="Runtime\Model\GltfModel.hpp" />
+    <ClInclude Include="ThirdParty\TinyGLTFConfig.hpp" />
+    <ClInclude Include="Rendering\Renderer.hpp" />
+    <ClInclude Include="Rendering\TrueTypeText.hpp" />
+    <ClInclude Include="Rendering\RenderTypes.hpp" />
+    <ClInclude Include="Rendering\RenderUtil.hpp" />
+    <ClInclude Include="Rendering\MenuTheme.hpp" />
+    <ClInclude Include="Rendering\Shader.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ItemGroup>
+    <PikoResource Include="$(ProjectDir)..\Resource\**\*" Exclude="$(ProjectDir)..\Resource\languages\**\*" />
+  </ItemGroup>
+  <ItemGroup>
+    <PikoLanguage Include="$(ProjectDir)..\Resource\languages\**\*" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PikoSdlPlatform Condition="'$(Platform)' == 'Win32'">x86</PikoSdlPlatform>
+    <PikoSdlPlatform Condition="'$(Platform)' != 'Win32'">$(Platform)</PikoSdlPlatform>
+    <PikoSdlRuntime>$(ProjectDir)..\External\SDL\lib\$(PikoSdlPlatform)\SDL3.dll</PikoSdlRuntime>
+  </PropertyGroup>
+  <Target Name="CopySdlRuntime" AfterTargets="Build" Condition="Exists('$(PikoSdlRuntime)')">
+    <MakeDir Directories="$(OutDir)" />
+    <Copy SourceFiles="$(PikoSdlRuntime)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+  <Target Name="CopyLanguageDefaults" AfterTargets="Build">
+    <Copy SourceFiles="%(PikoLanguage.Identity)"
+      DestinationFiles="$(OutDir)GAME_DATA\%(PikoLanguage.RecursiveDir)%(PikoLanguage.Filename)%(PikoLanguage.Extension)"
+      Condition="!Exists('$(OutDir)GAME_DATA\%(PikoLanguage.RecursiveDir)%(PikoLanguage.Filename)%(PikoLanguage.Extension)')" />
+  </Target>
+  <Target Name="CopyPikoResources" AfterTargets="Build">
+    <MakeDir Directories="$(OutDir)GAME_DATA\PIKO;$(OutDir)GAME_DATA\PIKO\ui\battle\centre" />
+    <Copy
+      SourceFiles="@(PikoResource)"
+      DestinationFiles="@(PikoResource->'$(OutDir)GAME_DATA\PIKO\%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true" />
+  </Target>
+  <ItemGroup>
+    <ResourceCompile Include="App\Piko.rc">
+      <AdditionalIncludeDirectories>$(ProjectDir)App;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <None Include="App\piko.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Modules\Stage\Stage3DDiagnostics.cpp" />
+    <ClCompile Include="Modules\Stage\Stage3DModels.cpp" />
+    <ClCompile Include="Modules\Stage\Stage3DAnimation.cpp" />
+    <ClCompile Include="Modules\Stage\Stage3DEffects.cpp" />
+    <ClCompile Include="Modules\Stage\Stage3DSkinning.cpp" />
+    <ClCompile Include="Modules\Stage\Stage3DCamera.cpp" />
+    <ClCompile Include="Modules\Stage\StageGameplay.cpp" />
+    <ClCompile Include="Modules\Stage\StageAssets.cpp" />
+    <ClCompile Include="Modules\Stage\StageHud.cpp" />
+    <ClCompile Include="Modules\Stage\StageAudio.cpp" />
+    <ClCompile Include="Modules\Stage\StageSession.cpp" />
+    <ClCompile Include="Modules\Stage\StageInput.cpp" />
+    <ClCompile Include="Modules\Stage\StageDebug.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Modules\Stage\Stage3DTypes.hpp" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,880 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{86479e18-2568-4e30-bfdc-43d1aed86908}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\glad">
+      <UniqueIdentifier>{a6f73f9b-8d04-40c2-8071-3e76254d4871}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{e7d62341-d771-4c18-83a6-bd3266fa4acb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{236292f2-fc58-4c85-bc25-ec84f4c9b5af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\App">
+      <UniqueIdentifier>{dfb3ea6e-c3b9-4873-9ce2-d72c8c21cefd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\App">
+      <UniqueIdentifier>{081c741c-d9e7-40d9-acfb-9dd6d05284c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules">
+      <UniqueIdentifier>{61621d8d-c695-4ee8-a1b5-dbc093d1c1e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Modules">
+      <UniqueIdentifier>{68f7ad1d-c0f0-4f31-b091-bb4da80c3fa7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Managers">
+      <UniqueIdentifier>{3fcd5e1d-012a-4abf-9b28-8089253a2e76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Managers">
+      <UniqueIdentifier>{40a7cf2b-64f7-4ba6-8f8d-e840f01f3802}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileTypes">
+      <UniqueIdentifier>{dc9c350a-8860-419f-9db1-747d38bb756e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileTypes">
+      <UniqueIdentifier>{83e45af1-1a3f-4c65-b2ec-a34faad83c0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileTypes\IMX">
+      <UniqueIdentifier>{55c87dd2-83bb-4578-93ea-1139f454d546}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileTypes\IMX">
+      <UniqueIdentifier>{da8c366d-4177-43ad-a7e8-252fcb615a5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileTypes\GMO">
+      <UniqueIdentifier>{5B205648-14F2-4487-96AE-F48393E8BD42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileTypes\GMO">
+      <UniqueIdentifier>{67DAD612-EFD3-46AA-960D-F62D858687F9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\Import">
+      <UniqueIdentifier>{E17B7B18-8D6A-4A4F-9A66-911C6B0A4D6F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Modules\Import">
+      <UniqueIdentifier>{8F7C3724-836A-4776-B9A4-A3E5B8B45EA6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\MainMenu">
+      <UniqueIdentifier>{089431a8-d5cd-4a4b-b770-2dd9a3f7a36d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Modules\MainMenu">
+      <UniqueIdentifier>{ac033968-a71d-42c8-b6c7-44175dce40e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\Result">
+      <UniqueIdentifier>{eb0cb85c-2a3e-4e48-8995-ea4bfc889167}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Modules\Result">
+      <UniqueIdentifier>{318b906a-e2cf-42c2-a12f-3a5141590468}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileTypes\XGM">
+      <UniqueIdentifier>{7e63f723-a74a-406c-b322-3f77bd978999}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileTypes\XGM">
+      <UniqueIdentifier>{ebfd7bb0-a1cb-4e48-83aa-fb909580c6bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileTypes\XG">
+      <UniqueIdentifier>{45cb85f5-a5f3-4014-874a-5e9e09ca9af1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileTypes\XG">
+      <UniqueIdentifier>{92ef817f-4ec8-4378-94ac-80906efefff2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileTypes\SSQ">
+      <UniqueIdentifier>{7be32e30-f816-4331-939d-c7c6b05072e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileTypes\SSQ">
+      <UniqueIdentifier>{4a1a0b17-097c-4a23-858b-f4922f0c0dd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GameData">
+      <UniqueIdentifier>{9f1c99ec-a9ff-4058-a552-3e0c45f95b31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameData">
+      <UniqueIdentifier>{0826558a-dfbd-4a76-8ebb-77b93a274826}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\StageSelect">
+      <UniqueIdentifier>{d193f346-cbf4-45e4-bf79-0917c175b282}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Modules\StageSelect">
+      <UniqueIdentifier>{ea66d44d-7365-4ed1-b8d3-bf8737be2864}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileTypes\IMC">
+      <UniqueIdentifier>{66560494-54e0-4e31-a1b8-0a752d91f9cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileTypes\IMC">
+      <UniqueIdentifier>{75b0c349-a389-40e6-88f3-0bf132140bde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{1f40bfd5-0262-40b6-afae-76acf2cef77b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{7d90257a-fd12-4759-8c1e-165da5e9bfa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\Loading">
+      <UniqueIdentifier>{b1ddbc80-7e3f-460a-ae3c-5ba91d616d28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Modules\Loading">
+      <UniqueIdentifier>{fb47ef13-63a4-4d6f-91ee-977d04bd82b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\Options">
+      <UniqueIdentifier>{715371a3-0b71-46d0-9a0b-d3c2c2b3285c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Modules\Options">
+      <UniqueIdentifier>{2f188b14-9e4f-421e-8a7e-7d28c9db427e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileTypes\AlbumDef">
+      <UniqueIdentifier>{febedc49-d91a-4e20-bfc6-5b06c866ebac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileTypes\AlbumDef">
+      <UniqueIdentifier>{22c4ace4-1aff-4432-b44b-461188ff9cf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\Stage">
+      <UniqueIdentifier>{2132323d-7cd2-4a3e-b7b6-deaab5a61f6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Modules\Stage">
+      <UniqueIdentifier>{ab756fe8-954a-40d5-8715-b313f9537943}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileTypes\CHC">
+      <UniqueIdentifier>{2264edcf-26da-4eda-8ea3-9718a4199aaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileTypes\CHC">
+      <UniqueIdentifier>{c3cd1fa7-42f1-42b3-ab65-88102bca3586}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime">
+      <UniqueIdentifier>{9ffefab3-0cd3-4dc6-84f7-d2337c7a03e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime">
+      <UniqueIdentifier>{c740b067-9d4a-437f-9891-9ea7dd0ef085}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\Stage">
+      <UniqueIdentifier>{d2dae8a8-27d1-4069-bf91-fa753865d4ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Stage">
+      <UniqueIdentifier>{5f560f8e-1ea8-453c-9e37-355e2e76a3ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime\Model">
+      <UniqueIdentifier>{4B7B42E4-DC2C-4A37-A694-8A1BFC8DB3A7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Model">
+      <UniqueIdentifier>{8FB5B896-4AA5-4BFA-8D9B-E37A05E1A50D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ThirdParty">
+      <UniqueIdentifier>{EDACFA67-A22D-4EEB-9F14-7500876A2E78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ThirdParty">
+      <UniqueIdentifier>{89A407ED-9206-45E0-A46D-1126960B1466}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\TinyGLTF">
+      <UniqueIdentifier>{F12770C3-8ED9-4A1E-B6E4-6BA95994E5F7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Conversion">
+      <UniqueIdentifier>{0D64975A-4C08-4AF9-B7CD-55B867D10272}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Conversion">
+      <UniqueIdentifier>{06D76B64-C932-4682-88BB-232C34D6D201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\imgui">
+      <UniqueIdentifier>{f67043f9-68b8-4024-b5f0-021262de3522}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Localization">
+      <UniqueIdentifier>{9580ef69-d32a-4c4d-b1c5-5bb9ef7ed27d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Localization">
+      <UniqueIdentifier>{e728db8e-c07d-4eb8-ab32-9c1cdc74d96e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\External\glad\src\gl.c">
+      <Filter>External\glad</Filter>
+    </ClCompile>
+    <ClCompile Include="App\main.cpp">
+      <Filter>Source Files\App</Filter>
+    </ClCompile>
+    <ClCompile Include="App\piko.cpp">
+      <Filter>Source Files\App</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTypes\IMX\IMX.cpp">
+      <Filter>Source Files\FileTypes\IMX</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTypes\AlbumDef\AlbumDef.cpp">
+      <Filter>Source Files\FileTypes\AlbumDef</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTypes\CHC\CHC.cpp">
+      <Filter>Source Files\FileTypes\CHC</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTypes\CHC\CHCJson.cpp">
+      <Filter>Source Files\FileTypes\CHC</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTypes\IMC\IMC.cpp">
+      <Filter>Source Files\FileTypes\IMC</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTypes\GMO\GMO.cpp">
+      <Filter>Source Files\FileTypes\GMO</Filter>
+    </ClCompile>
+    <ClCompile Include="GameData\GameDataRoot.cpp">
+      <Filter>Source Files\GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="GameData\SaveData.cpp">
+      <Filter>Source Files\GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="GameData\StageCatalog.cpp">
+      <Filter>Source Files\GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="GameData\RuntimeImporter.cpp">
+      <Filter>Source Files\GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="GameData\AlbumFlow.cpp">
+      <Filter>Source Files\GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTypes\XGM\XGM.cpp">
+      <Filter>Source Files\FileTypes\XGM</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTypes\XG\XG.cpp">
+      <Filter>Source Files\FileTypes\XG</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTypes\SSQ\SSQ.cpp">
+      <Filter>Source Files\FileTypes\SSQ</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTypes\SSQ\SSQJson.cpp">
+      <Filter>Source Files\FileTypes\SSQ</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\AudioManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\FrameStats.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\GameSettings.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\InputManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\TextureManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Import\ImportModule.cpp">
+      <Filter>Source Files\Modules\Import</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Loading\LoadingModule.cpp">
+      <Filter>Source Files\Modules\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Collection\CollectionModule.cpp">
+      <Filter>Source Files\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\MainMenu\MainMenuModule.cpp">
+      <Filter>Source Files\Modules\MainMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\PikoModule.cpp">
+      <Filter>Source Files\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\MainMenu\TitleBackgroundRenderer.cpp">
+      <Filter>Source Files\Modules\MainMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\MainMenu\TitleScreenBackdrop.cpp">
+      <Filter>Source Files\Modules\MainMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Options\OptionsModule.cpp">
+      <Filter>Source Files\Modules\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Options\GameplayVisualModule.cpp">
+      <Filter>Source Files\Modules\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Options\GameModifiersModule.cpp">
+      <Filter>Source Files\Modules\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Movie\MovieModule.cpp">
+      <Filter>Source Files\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Result\ResultModule.cpp">
+      <Filter>Source Files\Modules\Result</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\SaveLoad\SaveLoadModule.cpp">
+      <Filter>Source Files\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageTutorialRenderer.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageModule.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\Stage3DRenderer.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\Stage3DUtil.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageDebugHud.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageGeneratedTextures.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageGuardRenderer.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageModuleRendering.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StagePhraseRenderer.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageRibbonRenderer.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageTraceRenderer.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\StageSelect\StageSelectModule.cpp">
+      <Filter>Source Files\Modules\StageSelect</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StageConditionResolver.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StagePlayerState.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StageTutorialTimeline.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StageTutorialData.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StageInstrumentState.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StageRuntime.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\ResultAtlas.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StageHudModel.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Movie\MediaFoundationMoviePlayer.cpp">
+      <Filter>Source Files\Runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StageAudioController.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StageTraceBuilder.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StageView.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Stage\StageViewUtil.cpp">
+      <Filter>Source Files\Runtime\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Model\GltfDocument.cpp">
+      <Filter>Source Files\Runtime\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Model\GltfModel.cpp">
+      <Filter>Source Files\Runtime\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\TinyGLTF.cpp">
+      <Filter>Source Files\ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Renderer.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderUtil.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\TrueTypeText.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Shader.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Json.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\BinaryUtil.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\FileUtil.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\MathUtil.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\StrUtil.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Audio\ImcConverter.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Audio\PspAtracConverter.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Audio\WavWriter.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Video\PssConverter.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Chart\ChcJsonWriter.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Image\ImageConverter.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Image\GimConverter.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Image\PngWriter.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Input\FolderSource.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Input\Iso9660Source.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Input\SourceFactory.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Region\SourceScanner.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Runtime\RuntimeBuilder.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Model\XgGltfConverter.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Model\GmoGltfConverter.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Utility\PathNormalize.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Utility\JsonUtil.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Utility\ProcessUtil.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Convert\Model\GltfUtil.cpp">
+      <Filter>Source Files\Conversion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\imgui_widgets.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\imgui.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\imgui_draw.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\backends\imgui_impl_opengl3.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\backends\imgui_impl_sdl3.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\imgui_tables.cpp">
+      <Filter>External\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderTypes.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Audio\Pcm16.cpp">
+      <Filter>Source Files\Runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="Localization\Language.cpp">
+      <Filter>Source Files\Localization</Filter>
+    </ClCompile>
+    <ClCompile Include="Localization\LabelTexture.cpp">
+      <Filter>Source Files\Localization</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\BattleTexturePixels.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App\piko.hpp">
+      <Filter>Header Files\App</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTypes\IMX\IMX.hpp">
+      <Filter>Header Files\FileTypes\IMX</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTypes\AlbumDef\AlbumDef.hpp">
+      <Filter>Header Files\FileTypes\AlbumDef</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTypes\CHC\CHC.hpp">
+      <Filter>Header Files\FileTypes\CHC</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTypes\CHC\CHCJson.hpp">
+      <Filter>Header Files\FileTypes\CHC</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTypes\IMC\IMC.hpp">
+      <Filter>Header Files\FileTypes\IMC</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTypes\GMO\GMO.hpp">
+      <Filter>Header Files\FileTypes\GMO</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTypes\XGM\XGM.hpp">
+      <Filter>Header Files\FileTypes\XGM</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTypes\XG\XG.hpp">
+      <Filter>Header Files\FileTypes\XG</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTypes\SSQ\SSQ.hpp">
+      <Filter>Header Files\FileTypes\SSQ</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTypes\SSQ\SSQJson.hpp">
+      <Filter>Header Files\FileTypes\SSQ</Filter>
+    </ClInclude>
+    <ClInclude Include="GameData\GameDataRoot.hpp">
+      <Filter>Header Files\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="GameData\SaveData.hpp">
+      <Filter>Header Files\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="GameData\StageCatalog.hpp">
+      <Filter>Header Files\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="GameData\RuntimeImporter.hpp">
+      <Filter>Header Files\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="GameData\AlbumFlow.hpp">
+      <Filter>Header Files\GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\AudioManager.hpp">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\FrameStats.hpp">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\MenuNavigation.hpp">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\GameSettings.hpp">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\InterfaceStyle.hpp">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\InputManager.hpp">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\TextureManager.hpp">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Import\ImportModule.hpp">
+      <Filter>Header Files\Modules\Import</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Loading\LoadingModule.hpp">
+      <Filter>Header Files\Modules\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Collection\CollectionModule.hpp">
+      <Filter>Header Files\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\MainMenu\MainMenuAtlas.hpp">
+      <Filter>Header Files\Modules\MainMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\MainMenu\MainMenuModule.hpp">
+      <Filter>Header Files\Modules\MainMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\MainMenu\TitleBackgroundRenderer.hpp">
+      <Filter>Header Files\Modules\MainMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\MainMenu\TitleScreenBackdrop.hpp">
+      <Filter>Header Files\Modules\MainMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Options\OptionsModule.hpp">
+      <Filter>Header Files\Modules\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Options\GameplayVisualModule.hpp">
+      <Filter>Header Files\Modules\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Options\GameModifiersModule.hpp">
+      <Filter>Header Files\Modules\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Movie\MovieModule.hpp">
+      <Filter>Header Files\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Result\ResultModule.hpp">
+      <Filter>Header Files\Modules\Result</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\SaveLoad\SaveLoadModule.hpp">
+      <Filter>Header Files\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\StageTutorialRenderer.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\StageModule.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\Stage3DRenderer.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\Stage3DUtil.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\StageModuleRendering.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\StageModuleConstants.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\StageGeneratedTextures.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\StageDebugHud.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\StageRibbonRenderer.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\StageTraceRenderer.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\StagePhraseRenderer.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Stage\StageGuardRenderer.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\StageSelect\StageSelectModule.hpp">
+      <Filter>Header Files\Modules\StageSelect</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\PikoModule.hpp">
+      <Filter>Header Files\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageConditionResolver.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageGameplayInterfaceAtlas.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\ResultAtlas.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StagePlayerState.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageTutorialTimeline.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageTutorialData.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageInstrumentState.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageRuntime.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageResultData.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageHudModel.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Audio\InstrumentPlayback.hpp">
+      <Filter>Header Files\Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Audio\InstrumentAudio.hpp">
+      <Filter>Header Files\Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Audio\Pcm16.hpp">
+      <Filter>Header Files\Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Movie\MediaFoundationMoviePlayer.hpp">
+      <Filter>Header Files\Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageAudioController.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageTraceBuilder.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageView.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Stage\StageViewUtil.hpp">
+      <Filter>Header Files\Runtime\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Model\GltfDocument.hpp">
+      <Filter>Header Files\Runtime\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Model\GltfModel.hpp">
+      <Filter>Header Files\Runtime\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\TinyGLTFConfig.hpp">
+      <Filter>Header Files\ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Renderer.hpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\TrueTypeText.hpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RenderTypes.hpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RenderUtil.hpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\MenuTheme.hpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Shader.hpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\EnumUtil.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Json.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\BinaryUtil.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\FileUtil.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\MathUtil.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\StrUtil.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Audio\ImcConverter.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Audio\PspAtracConverter.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Audio\WavWriter.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Video\PssConverter.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Chart\ChcJsonWriter.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Image\ImageConverter.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Image\GimConverter.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Image\PngWriter.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Input\FolderSource.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Input\IGameSource.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Input\Iso9660Source.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Input\SourceFactory.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Region\SourceScanner.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Runtime\RuntimeBuilder.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Model\XgGltfConverter.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Model\GmoGltfConverter.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Utility\PathNormalize.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Utility\JsonUtil.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Utility\ProcessUtil.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Convert\Model\GltfUtil.hpp">
+      <Filter>Header Files\Conversion</Filter>
+    </ClInclude>
+    <ClInclude Include="Localization\Language.hpp">
+      <Filter>Header Files\Localization</Filter>
+    </ClInclude>
+    <ClInclude Include="Localization\LabelTexture.hpp">
+      <Filter>Header Files\Localization</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\BattleTexturePixels.hpp">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="App\Piko.rc">
+      <Filter>Source Files\App</Filter>
+    </ResourceCompile>
+    <None Include="App\piko.ico">
+      <Filter>Source Files\App</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Modules\Stage\Stage3DDiagnostics.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\Stage3DModels.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\Stage3DAnimation.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\Stage3DEffects.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\Stage3DSkinning.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\Stage3DCamera.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageGameplay.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageAssets.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageHud.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageAudio.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageSession.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageInput.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Stage\StageDebug.cpp">
+      <Filter>Source Files\Modules\Stage</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Modules\Stage\Stage3DTypes.hpp">
+      <Filter>Header Files\Modules\Stage</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

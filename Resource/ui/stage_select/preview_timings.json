@@ -1,0 +1,258 @@
+{
+    "version": 1,
+    "stages": [
+        {
+            "stage": 0,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 360.0,
+                    "section_index": 0,
+                    "section_frame": 360.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 900.0,
+                    "section_index": 0,
+                    "section_frame": 900.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 1440.0,
+                    "section_index": 0,
+                    "section_frame": 1440.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 1,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 1711.85,
+                    "section_index": 1,
+                    "section_frame": 1148.4,
+                    "tempo": 115.0,
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 2,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 1619.4,
+                    "section_index": 1,
+                    "section_frame": 1007.65,
+                    "tempo": 153.0,
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 3,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 286.2,
+                    "section_index": 0,
+                    "section_frame": 286.2,
+                    "tempo": 101.4,
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 4,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 1079.4,
+                    "section_index": 1,
+                    "section_frame": 817.585,
+                    "tempo": 165.0,
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 5,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 2163.313,
+                    "section_index": 2,
+                    "section_frame": 501.788,
+                    "tempo": 65.0,
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 6,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 360.0,
+                    "section_index": 0,
+                    "section_frame": 360.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 900.0,
+                    "section_index": 0,
+                    "section_frame": 900.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 1440.0,
+                    "section_index": 0,
+                    "section_frame": 1440.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 7,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 184.2,
+                    "section_index": 0,
+                    "section_frame": 184.2,
+                    "tempo": 140.0,
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 8,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 360.0,
+                    "section_index": 0,
+                    "section_frame": 360.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 900.0,
+                    "section_index": 0,
+                    "section_frame": 900.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 1440.0,
+                    "section_index": 0,
+                    "section_frame": 1440.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 9,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 360.0,
+                    "section_index": 0,
+                    "section_frame": 360.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 900.0,
+                    "section_index": 0,
+                    "section_frame": 900.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 1440.0,
+                    "section_index": 0,
+                    "section_frame": 1440.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 10,
+            "visuals": "PS2",
+            "candidates": [
+                {
+                    "global_frame": 1515.6,
+                    "section_index": 3,
+                    "section_frame": 42.9,
+                    "tempo": 88.0,
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 11,
+            "visuals": "PSP",
+            "candidates": [
+                {
+                    "global_frame": 360.0,
+                    "section_index": 0,
+                    "section_frame": 360.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 900.0,
+                    "section_index": 0,
+                    "section_frame": 900.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 1440.0,
+                    "section_index": 0,
+                    "section_frame": 1440.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        },
+        {
+            "stage": 12,
+            "visuals": "PSP",
+            "candidates": [
+                {
+                    "global_frame": 360.0,
+                    "section_index": 0,
+                    "section_frame": 360.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 900.0,
+                    "section_index": 0,
+                    "section_frame": 900.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                },
+                {
+                    "global_frame": 1440.0,
+                    "section_index": 0,
+                    "section_frame": 1440.0,
+                    "tempo": "stage",
+                    "portable_animation_frame": 0.0
+                }
+            ]
+        }
+    ]
+}

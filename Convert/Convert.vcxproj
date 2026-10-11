@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{8A7D8D8D-0D1C-49B1-A6F5-41F651F5F10A}</ProjectGuid>
+    <RootNamespace>Convert</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <VcpkgEnabled>false</VcpkgEnabled>
+    <VcpkgApplocalDeps>false</VcpkgApplocalDeps>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Build\intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>Convert</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Piko;$(ProjectDir)..\External\tinygltf;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Piko;$(ProjectDir)..\External\tinygltf;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Input\IGameSource.hpp" />
+    <ClInclude Include="Input\FolderSource.hpp" />
+    <ClInclude Include="Input\Iso9660Source.hpp" />
+    <ClInclude Include="Input\SourceFactory.hpp" />
+    <ClInclude Include="Utility\JsonUtil.hpp" />
+    <ClInclude Include="Utility\PathNormalize.hpp" />
+    <ClInclude Include="Utility\ProcessUtil.hpp" />
+    <ClInclude Include="Region\SourceScanner.hpp" />
+    <ClInclude Include="..\Piko\Utils\BattleTexturePixels.hpp" />
+    <ClInclude Include="Runtime\RuntimeBuilder.hpp" />
+    <ClInclude Include="Model\XgGltfConverter.hpp" />
+    <ClInclude Include="Model\GmoGltfConverter.hpp" />
+    <ClInclude Include="Model\GltfUtil.hpp" />
+    <ClInclude Include="Audio\WavWriter.hpp" />
+    <ClInclude Include="Image\ImageConverter.hpp" />
+    <ClInclude Include="Image\GimConverter.hpp" />
+    <ClInclude Include="Audio\ImcConverter.hpp" />
+    <ClInclude Include="Audio\PspAtracConverter.hpp" />
+    <ClInclude Include="Video\PssConverter.hpp" />
+    <ClInclude Include="Chart\ChcJsonWriter.hpp" />
+    <ClInclude Include="Image\PngWriter.hpp" />
+    <ClInclude Include="..\Piko\FileTypes\CHC\CHC.hpp" />
+    <ClInclude Include="..\Piko\FileTypes\IMC\IMC.hpp" />
+    <ClInclude Include="..\Piko\FileTypes\IMX\IMX.hpp" />
+    <ClInclude Include="..\Piko\FileTypes\XGM\XGM.hpp" />
+    <ClInclude Include="..\Piko\FileTypes\XG\XG.hpp" />
+    <ClInclude Include="..\Piko\FileTypes\GMO\GMO.hpp" />
+    <ClInclude Include="..\Piko\FileTypes\SSQ\SSQ.hpp" />
+    <ClInclude Include="..\Piko\FileTypes\SSQ\SSQJson.hpp" />
+    <ClInclude Include="..\Piko\FileTypes\CHC\CHCJson.hpp" />
+    <ClInclude Include="..\Piko\Utils\BinaryUtil.hpp" />
+    <ClInclude Include="..\Piko\Utils\Json.hpp" />
+    <ClInclude Include="..\Piko\Utils\StrUtil.hpp" />
+    <ClInclude Include="..\Piko\ThirdParty\TinyGLTFConfig.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Input\FolderSource.cpp" />
+    <ClCompile Include="Input\Iso9660Source.cpp" />
+    <ClCompile Include="Input\SourceFactory.cpp" />
+    <ClCompile Include="Utility\JsonUtil.cpp" />
+    <ClCompile Include="Utility\PathNormalize.cpp" />
+    <ClCompile Include="Utility\ProcessUtil.cpp" />
+    <ClCompile Include="Region\SourceScanner.cpp" />
+    <ClCompile Include="..\Piko\Utils\BattleTexturePixels.cpp" />
+    <ClCompile Include="..\Piko\Utils\MathUtil.cpp" />
+    <ClCompile Include="Runtime\RuntimeBuilder.cpp" />
+    <ClCompile Include="Model\XgGltfConverter.cpp" />
+    <ClCompile Include="Model\GmoGltfConverter.cpp" />
+    <ClCompile Include="Model\GltfUtil.cpp" />
+    <ClCompile Include="Audio\WavWriter.cpp" />
+    <ClCompile Include="Audio\ImcConverter.cpp" />
+    <ClCompile Include="Audio\PspAtracConverter.cpp" />
+    <ClCompile Include="Video\PssConverter.cpp" />
+    <ClCompile Include="Chart\ChcJsonWriter.cpp" />
+    <ClCompile Include="Image\ImageConverter.cpp" />
+    <ClCompile Include="Image\GimConverter.cpp" />
+    <ClCompile Include="Image\PngWriter.cpp" />
+    <ClCompile Include="..\Piko\FileTypes\CHC\CHC.cpp" />
+    <ClCompile Include="..\Piko\FileTypes\AlbumDef\AlbumDef.cpp" />
+    <ClCompile Include="..\Piko\FileTypes\IMC\IMC.cpp" />
+    <ClCompile Include="..\Piko\FileTypes\IMX\IMX.cpp" />
+    <ClCompile Include="..\Piko\FileTypes\XGM\XGM.cpp" />
+    <ClCompile Include="..\Piko\FileTypes\XG\XG.cpp" />
+    <ClCompile Include="..\Piko\FileTypes\GMO\GMO.cpp" />
+    <ClCompile Include="..\Piko\FileTypes\SSQ\SSQ.cpp" />
+    <ClCompile Include="..\Piko\FileTypes\SSQ\SSQJson.cpp" />
+    <ClCompile Include="..\Piko\FileTypes\CHC\CHCJson.cpp" />
+    <ClCompile Include="..\Piko\Utils\BinaryUtil.cpp" />
+    <ClCompile Include="..\Piko\Utils\Json.cpp" />
+    <ClCompile Include="..\Piko\Utils\StrUtil.cpp" />
+    <ClCompile Include="..\Piko\Runtime\Audio\Pcm16.cpp" />
+    <ClCompile Include="..\Piko\Rendering\RenderUtil.cpp" />
+    <ClCompile Include="..\Piko\ThirdParty\TinyGLTF.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ItemGroup>
+    <PikoResource Include="$(ProjectDir)..\Resource\**\*" Exclude="$(ProjectDir)..\Resource\languages\**\*" />
+  </ItemGroup>
+  <ItemGroup>
+    <PikoLanguage Include="$(ProjectDir)..\Resource\languages\**\*" />
+  </ItemGroup>
+  <Target Name="CopyLanguageDefaults" AfterTargets="Build">
+    <Copy SourceFiles="%(PikoLanguage.Identity)"
+      DestinationFiles="$(OutDir)GAME_DATA\%(PikoLanguage.RecursiveDir)%(PikoLanguage.Filename)%(PikoLanguage.Extension)"
+      Condition="!Exists('$(OutDir)GAME_DATA\%(PikoLanguage.RecursiveDir)%(PikoLanguage.Filename)%(PikoLanguage.Extension)')" />
+  </Target>
+  <Target Name="CopyPikoResources" AfterTargets="Build">
+    <MakeDir Directories="$(OutDir)GAME_DATA\PIKO;$(OutDir)GAME_DATA\PIKO\ui\battle\centre" />
+    <Copy SourceFiles="@(PikoResource)"
+      DestinationFiles="@(PikoResource->'$(OutDir)GAME_DATA\PIKO\%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true" />
+  </Target>
+</Project>
