@@ -41,7 +41,8 @@ namespace piko::modules
     {
         constexpr std::array<const char *, row_count> names{
             "@ui.no_death_mode",
-            "@ui.only_aim_mode",
+            "@ui.auto_press_mode",
+            "@ui.auto_aim_mode",
             "@ui.all_sections_mode",
             "@ui.mirror_mode",
             "@ui.player_receive_damage",
@@ -69,8 +70,10 @@ namespace piko::modules
         {
             case Row::NoDeath:
                 return &settings.no_death_mode;
-            case Row::OnlyAim:
-                return &settings.only_aim_mode;
+            case Row::AutoPress:
+                return &settings.auto_press_mode;
+            case Row::AutoAim:
+                return &settings.auto_aim_mode;
             case Row::AllSections:
                 return &settings.all_sections_mode;
             case Row::Mirror:

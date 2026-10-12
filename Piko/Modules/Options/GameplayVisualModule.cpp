@@ -1857,7 +1857,7 @@ namespace piko::modules
         switch( view_ )
         {
             case View::Menu:
-                return 8;
+                return 9;
             case View::AimMenu:
                 return 4;
             case View::FontList:
@@ -1883,6 +1883,7 @@ namespace piko::modules
     {
         static constexpr std::array menu{
             SettingRow::MenuFont,
+            SettingRow::HideBattleUi,
             SettingRow::AimEntry,
             SettingRow::TraceLineEntry,
             SettingRow::NotesEntry,
@@ -2070,6 +2071,8 @@ namespace piko::modules
                 return localization::text( "@ui.interface.aiming" );
             case SettingRow::MenuFont:
                 return localization::text( "@ui.interface.menu_font" );
+            case SettingRow::HideBattleUi:
+                return localization::text( "@ui.interface.hide_battle_ui" );
             case SettingRow::FontChoice:
                 return index == 0 ? localization::text( "@ui.interface.language_default" )
                                   : font_files_.at( static_cast<std::size_t>( index - 1 ) ).name.c_str();
@@ -2249,6 +2252,9 @@ namespace piko::modules
                 return style.aim_style;
             case SettingRow::WingSpread:
                 return format_float( style.cone_wing_spread_scale );
+            case SettingRow::HideBattleUi:
+                return app.settings().hide_battle_ui ? localization::text( "@ui.on_upper" )
+                                                     : localization::text( "@ui.off_upper" );
             case SettingRow::GuardDpad:
                 return app.settings().guard_notes_accept_dpad ? localization::text( "@ui.on_upper" )
                                                               : localization::text( "@ui.off_upper" );
@@ -2490,6 +2496,13 @@ namespace piko::modules
             return;
         }
 
+        if( row == SettingRow::HideBattleUi )
+        {
+            app.settings().hide_battle_ui = !app.settings().hide_battle_ui;
+            play_menu_sound( app, "SELECT" );
+            return;
+        }
+
         if( row == SettingRow::GuardDpad )
         {
             app.settings().guard_notes_accept_dpad = !app.settings().guard_notes_accept_dpad;
@@ -2571,6 +2584,12 @@ namespace piko::modules
     void GameplayVisualModule::confirm_selection( App &app )
     {
         const SettingRow row = row_kind( selected_row_ );
+
+        if( row == SettingRow::HideBattleUi )
+        {
+            adjust_selected( app, 1 );
+            return;
+        }
 
         if( row == SettingRow::MenuFont )
         {
@@ -2811,6 +2830,7 @@ namespace piko::modules
             case SettingRow::WingWidth:
             case SettingRow::ArrowOffsetX:
             case SettingRow::WingOffsetX:
+            case SettingRow::HideBattleUi:
             case SettingRow::GuardDpad:
             case SettingRow::GuardSize:
             case SettingRow::GuardIcons:

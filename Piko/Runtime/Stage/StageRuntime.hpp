@@ -345,13 +345,15 @@ namespace piko::runtime::stage
 
         void seek_relative_samples( std::int64_t sample_delta );
         void notify_condition_state_changed();
+        [[nodiscard]] StageInputSnapshot auto_aim_input( StageInputSnapshot input ) const;
         void update_judgement( const StageInputSnapshot &input );
         [[nodiscard]] bool holding_phrase_for_chart( const ActiveChart &chart ) const;
         void set_local_energy_immediate( float value );
         void set_charge_recovery_enabled( bool enabled );
         void set_instrument_playback_mode( audio::InstrumentPlaybackMode mode );
         void set_game_modifiers( bool no_death,
-            bool only_aim,
+            bool auto_press,
+            bool auto_aim,
             bool all_sections,
             float player_damage_multiplier = 1.0f,
             float enemy_damage_multiplier = 1.0f );
@@ -584,7 +586,10 @@ namespace piko::runtime::stage
         void invalidate_transition_prediction();
         void ensure_transition_prediction();
         [[nodiscard]] std::size_t branch_merge_section( const std::vector<std::size_t> &routes ) const;
-        [[nodiscard]] std::size_t next_unplayed_section( std::size_t start ) const;
+        [[nodiscard]] bool sections_match( std::size_t first, std::size_t second, bool ordered_repeat = false ) const;
+        void build_section_content_groups();
+        [[nodiscard]] bool section_was_played( std::size_t section ) const;
+        [[nodiscard]] std::size_t next_unplayed_section( std::size_t start, std::size_t stop ) const;
         void lock_transition_if_needed();
         [[nodiscard]] std::int64_t section_duration_samples( std::size_t section_index ) const;
         [[nodiscard]] bool route_can_still_change() const;
@@ -686,11 +691,13 @@ namespace piko::runtime::stage
         bool paused_ = false;
         bool charge_recovery_enabled_ = true;
         bool no_death_mode_ = false;
-        bool only_aim_mode_ = false;
+        bool auto_press_mode_ = false;
+        bool auto_aim_mode_ = false;
         bool all_sections_mode_ = false;
         float player_damage_multiplier_ = 1.0f;
         float enemy_damage_multiplier_ = 1.0f;
         std::vector<std::uint32_t> section_visit_counts_{};
+        std::vector<std::size_t> section_content_groups_{};
 
         struct BranchPlayback
         {
@@ -737,6 +744,7 @@ namespace piko::runtime::stage
         StageInputSnapshot previous_instrument_input_{};
         std::size_t judgement_section_index_ = static_cast<std::size_t>( -1 );
         std::int64_t last_judgement_update_section_sample_ = 0;
+        bool judgement_input_received_ = false;
         std::array<std::uint64_t, 4> actor_phrase_tokens_{};
         std::array<bool, 4> automated_duet_contribution_active_{};
         std::array<StageActorActionState, 4> automated_duet_contribution_actions_{};

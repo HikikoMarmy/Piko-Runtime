@@ -374,7 +374,7 @@ namespace piko::modules
             tutorial_.begin_completion( app );
             runtime_.set_paused( true );
             stage_audio_.stop_song( app.audio() );
-            app.input().set_battle_input( app.window(), false, false );
+            app.input().set_battle_input( app.window(), false, false, false );
             return true;
         }
 

@@ -200,6 +200,7 @@
     <ClCompile Include="Managers\AudioManager.cpp" />
     <ClCompile Include="Managers\FrameStats.cpp" />
     <ClCompile Include="Managers\GameSettings.cpp" />
+    <ClCompile Include="Managers\SettingsWriter.cpp" />
     <ClCompile Include="Managers\InputManager.cpp" />
     <ClCompile Include="Managers\TextureManager.cpp" />
     <ClCompile Include="Modules\Import\ImportModule.cpp" />
@@ -297,6 +298,7 @@
     <ClInclude Include="Managers\AudioManager.hpp" />
     <ClInclude Include="Managers\FrameStats.hpp" />
     <ClInclude Include="Managers\GameSettings.hpp" />
+    <ClInclude Include="Managers\SettingsWriter.hpp" />
     <ClInclude Include="Managers\MenuNavigation.hpp" />
     <ClInclude Include="Managers\InterfaceStyle.hpp" />
     <ClInclude Include="Managers\InputManager.hpp" />
@@ -401,10 +403,10 @@
     <MakeDir Directories="$(OutDir)" />
     <Copy SourceFiles="$(PikoSdlRuntime)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
   </Target>
-  <Target Name="CopyLanguageDefaults" AfterTargets="Build">
+  <Target Name="CopyLanguages" AfterTargets="Build">
     <Copy SourceFiles="%(PikoLanguage.Identity)"
       DestinationFiles="$(OutDir)GAME_DATA\%(PikoLanguage.RecursiveDir)%(PikoLanguage.Filename)%(PikoLanguage.Extension)"
-      Condition="!Exists('$(OutDir)GAME_DATA\%(PikoLanguage.RecursiveDir)%(PikoLanguage.Filename)%(PikoLanguage.Extension)')" />
+      SkipUnchangedFiles="true" />
   </Target>
   <Target Name="CopyPikoResources" AfterTargets="Build">
     <MakeDir Directories="$(OutDir)GAME_DATA\PIKO;$(OutDir)GAME_DATA\PIKO\ui\battle\centre" />

@@ -416,21 +416,25 @@ namespace piko::modules
 
     void StageModule::update_mouse_capture( App &app )
     {
-        bool allow_mouse_aim = app.settings().mouse_controls_enabled && !runtime_.paused() && !stage_result_active_ &&
-                               !tutorial_completion_active_ &&
-                               ( !teaching_tutorial() || tutorial_.timeline().aim_visible() );
+        bool allow_mouse_notes =
+            app.settings().mouse_controls_enabled
+            && !runtime_.paused()
+            && !stage_result_active_
+            && !tutorial_completion_active_
+            && ( !teaching_tutorial() || tutorial_.timeline().aim_visible() );
 
 #if PIKO_STAGE_HAS_IMGUI
         if( ImGui::GetCurrentContext() != nullptr )
         {
             const auto &io = ImGui::GetIO();
-            allow_mouse_aim = allow_mouse_aim && !io.WantCaptureMouse && !io.WantCaptureKeyboard;
+            allow_mouse_notes = allow_mouse_notes && !io.WantCaptureMouse && !io.WantCaptureKeyboard;
         }
 #endif
 
         app.input().set_battle_input( app.window(),
             !stage_result_active_ && !tutorial_completion_active_,
-            allow_mouse_aim );
+            allow_mouse_notes && !app.settings().auto_aim_mode,
+            allow_mouse_notes );
     }
 
     void StageModule::render_mouse_tether( const App &app,
@@ -440,8 +444,10 @@ namespace piko::modules
     {
         const auto aim = app.input().mouse_aim();
 
-        if( !aim.active || !app.settings().mouse_controls_enabled ||
-            ( teaching_tutorial() && !tutorial_.timeline().aim_visible() ) )
+        if( !aim.active
+            || !app.settings().mouse_controls_enabled
+            || app.settings().auto_aim_mode
+            || ( teaching_tutorial() && !tutorial_.timeline().aim_visible() ) )
         {
             return;
         }

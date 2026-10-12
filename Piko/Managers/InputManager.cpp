@@ -129,7 +129,7 @@ namespace piko::managers
 
     void InputManager::shutdown()
     {
-        set_battle_input( mouse_window_, false, false );
+        set_battle_input( mouse_window_, false, false, false );
 
         rumble_motors( 0.0f, 0.0f, 0 );
         close_gamepad();
@@ -844,7 +844,7 @@ namespace piko::managers
                         tap( InputAction::Confirm );
                     }
 
-                    if( !battle_input_enabled_ || mouse_aim_allowed_ )
+                    if( !battle_input_enabled_ || mouse_notes_allowed_ )
                     {
                         press( InputAction::StageMouseLeft );
                     }
@@ -857,7 +857,7 @@ namespace piko::managers
 
                     if( battle_input_enabled_ )
                     {
-                        if( mouse_aim_allowed_ )
+                        if( mouse_notes_allowed_ )
                         {
                             press( InputAction::StageMouseRight );
                         }
@@ -888,6 +888,7 @@ namespace piko::managers
 
             case SDL_EVENT_WINDOW_FOCUS_LOST:
                 mouse_aim_allowed_ = false;
+                mouse_notes_allowed_ = false;
                 set_mouse_capture( false );
 
                 for( std::size_t index = 0; index < action_down_.size(); ++index )
@@ -1447,13 +1448,14 @@ namespace piko::managers
         return { mouse_aim_x_, mouse_aim_y_, mouse_aim_active_ };
     }
 
-    void InputManager::set_battle_input( SDL_Window *window, bool enabled, bool allow_mouse_aim )
+    void InputManager::set_battle_input( SDL_Window *window, bool enabled, bool allow_mouse_aim, bool allow_mouse_notes )
     {
         SDL_Window *target_window = window != nullptr ? window : mouse_window_;
         const bool focused =
             target_window != nullptr && ( SDL_GetWindowFlags( target_window ) & SDL_WINDOW_INPUT_FOCUS ) != 0;
 
         const bool allowed = enabled && allow_mouse_aim && focused;
+        const bool notes_allowed = enabled && allow_mouse_notes && focused;
         const bool changed = enabled != battle_input_enabled_ || target_window != mouse_window_;
 
         if( changed || !allowed )
@@ -1462,7 +1464,7 @@ namespace piko::managers
             clear_mouse_aim();
         }
 
-        if( changed || ( mouse_aim_allowed_ && !allowed ) )
+        if( changed || ( mouse_notes_allowed_ && !notes_allowed ) )
         {
             release( InputAction::StageMouseLeft );
             release( InputAction::StageMouseRight );
@@ -1474,6 +1476,7 @@ namespace piko::managers
         battle_input_enabled_ = enabled;
 
         mouse_aim_allowed_ = allowed;
+        mouse_notes_allowed_ = notes_allowed;
 
         mouse_window_ = enabled ? target_window : nullptr;
         set_mouse_capture( allowed );

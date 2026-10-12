@@ -110,7 +110,11 @@ namespace piko::modules
     void StageModule::enter( App &app )
     {
         active_modifier_text_ = modifier_text( app.settings() );
-        app.input().set_battle_input( app.window(), true, app.settings().mouse_controls_enabled );
+        app.input().set_battle_input(
+            app.window(),
+            true,
+            app.settings().mouse_controls_enabled && !app.settings().auto_aim_mode,
+            app.settings().mouse_controls_enabled );
 
         elapsed_seconds_ = 0.0;
 
@@ -166,12 +170,18 @@ namespace piko::modules
 
         if( tutorial_session() )
         {
-            runtime_.set_game_modifiers( false, false, false );
+            runtime_.set_game_modifiers(
+                false,
+                app.settings().auto_press_mode,
+                app.settings().auto_aim_mode,
+                false );
         }
         else
         {
-            runtime_.set_game_modifiers( app.settings().no_death_mode,
-                app.settings().only_aim_mode,
+            runtime_.set_game_modifiers(
+                app.settings().no_death_mode,
+                app.settings().auto_press_mode,
+                app.settings().auto_aim_mode,
                 app.settings().all_sections_mode,
                 app.settings().player_damage_multiplier,
                 app.settings().enemy_damage_multiplier );
@@ -245,7 +255,7 @@ namespace piko::modules
 
     void StageModule::leave( App &app )
     {
-        app.input().set_battle_input( app.window(), false, false );
+        app.input().set_battle_input( app.window(), false, false, false );
 
         app.audio().release_channel( result_menu_sound_channel_ );
         result_menu_sound_channel_ = {};
@@ -789,7 +799,7 @@ namespace piko::modules
 
         stage_input.action_down = any_source_down();
 
-        if( tutorial_session() || !app.settings().only_aim_mode )
+        if( !app.settings().auto_press_mode )
         {
             previous_phrase_action_down_ = stage_input.action_down;
         }
@@ -812,33 +822,15 @@ namespace piko::modules
 
         stage_input.automatic_notes = teaching_tutorial() && tutorial_.timeline().automatic_notes();
 
-        if( stage_input.automatic_notes )
-        {
-            const auto &actor = runtime_.state().actor_actions[ 0 ];
-
-            if( actor.has_aim )
-            {
-                const float target_x = actor.aim_x * stage_input.aim_target_scale_x;
-                const float target_y = actor.aim_y * stage_input.aim_target_scale_y;
-                const float length = std::max( std::hypot( target_x, target_y ), 0.0001f );
-                latest_aim_x_ = target_x / length;
-
-                latest_aim_y_ = target_y / length;
-
-                latest_aim_strength_ = 1.0f;
-
-                stage_input.aim_x = latest_aim_x_;
-
-                stage_input.aim_y = latest_aim_y_;
-
-                stage_input.aim_strength = 1.0f;
-            }
-        }
+        stage_input = runtime_.auto_aim_input( std::move( stage_input ) );
+        latest_aim_x_ = stage_input.aim_x;
+        latest_aim_y_ = stage_input.aim_y;
+        latest_aim_strength_ = stage_input.aim_strength;
 
         runtime_.set_instrument_playback_mode( app.settings().instrument_playback );
         runtime_.update_judgement( stage_input );
 
-        if( stage_input.automatic_notes || ( !tutorial_session() && app.settings().only_aim_mode ) )
+        if( stage_input.automatic_notes || app.settings().auto_press_mode )
         {
             const runtime::stage::StageJudgementDebugState &auto_judgement = runtime_.judgement_debug_state();
             stage_input.events.clear();

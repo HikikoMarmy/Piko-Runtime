@@ -1,27 +1,22 @@
-#include "Utils/EnumUtil.hpp"
 #include "GameSettings.hpp"
+#include "SettingsWriter.hpp"
 #include "Localization/Language.hpp"
-
-#include "Utils/Json.hpp"
 #include "Utils/FileUtil.hpp"
+#include "Utils/Json.hpp"
 
-#include <cstdint>
 #include <SDL3/SDL.h>
 
 #include <algorithm>
 #include <cmath>
 #include <fstream>
-#include <iomanip>
-#include <sstream>
+#include <stdexcept>
 #include <system_error>
+#include <utility>
 
 namespace piko::managers
 {
-    namespace game_settings
+    namespace
     {
-        constexpr std::int32_t settings_version = 1;
-        constexpr std::int32_t visual_profile_version = 1;
-
         float clamp_number( double value, float minimum, float maximum )
         {
             return std::clamp( static_cast<float>( value ), minimum, maximum );
@@ -43,7 +38,9 @@ namespace piko::managers
         {
             if( const utils::json::Value *entry = object.find( key ); entry != nullptr )
             {
-                value = std::clamp( static_cast<std::int32_t>( entry->integer_or( value ) ), minimum, maximum );
+                const auto number = entry->integer_or( value );
+                const auto clamped = std::clamp<std::int64_t>( number, minimum, maximum );
+                value = static_cast<std::int32_t>( clamped );
             }
         }
 
@@ -77,33 +74,27 @@ namespace piko::managers
             }
         }
 
-        void write_color( std::ostream &stream, const std::array<float, 4> &color )
+        void load_string( const utils::json::Value &object,
+            const char *key,
+            std::string &value,
+            const std::string &fallback = {} )
         {
-            stream << '[' << color[ 0 ] << ", " << color[ 1 ] << ", " << color[ 2 ] << ", " << color[ 3 ] << ']';
+            if( const auto *entry = object.find( key ); entry != nullptr )
+            {
+                value = entry->string_or( fallback );
+            }
         }
 
-        void write_json_string( std::ostream &stream, const std::string &value )
+        template<typename Enum>
+        void load_enum( const utils::json::Value &object,
+            const char *key,
+            Enum &value,
+            Enum minimum,
+            Enum maximum )
         {
-            constexpr char digits[] = "0123456789abcdef";
-            stream << '"';
-
-            for( const unsigned char character : value )
-            {
-                if( character == '"' || character == '\\' )
-                {
-                    stream << '\\' << static_cast<char>( character );
-                }
-                else if( character < 0x20 )
-                {
-                    stream << "\\u00" << digits[ character >> 4 ] << digits[ character & 0x0f ];
-                }
-                else
-                {
-                    stream << static_cast<char>( character );
-                }
-            }
-
-            stream << '"';
+            auto number = utils::to_int( value );
+            load_int( object, key, number, utils::to_int( minimum ), utils::to_int( maximum ) );
+            value = utils::to_enum<Enum>( number );
         }
 
         void load_interface_styles( const utils::json::Value &root, GameSettings &settings )
@@ -136,36 +127,27 @@ namespace piko::managers
             }
         }
 
-        void write_interface_styles( std::ostream &stream, const GameSettings &settings )
+        void write_interface_styles( SettingsWriter &writer, const GameSettings &settings )
         {
-            stream << "  \"interface_styles\": {";
-            bool first = true;
+            std::vector<std::string> languages;
 
-            for( const auto &[ language, style ] : settings.interface_styles )
+            for( const auto &entry : settings.interface_styles )
             {
-                if( !first )
-                {
-                    stream << ',';
-                }
-
-                first = false;
-                write_json_string( stream, language );
-                stream << ":{\"fonts\":[";
-
-                for( std::size_t index = 0; index < style.fonts.size(); ++index )
-                {
-                    if( index > 0 )
-                    {
-                        stream << ',';
-                    }
-
-                    write_json_string( stream, style.fonts[ index ] );
-                }
-
-                stream << "]}";
+                languages.push_back( entry.first );
             }
 
-            stream << "},\n";
+            std::sort( languages.begin(), languages.end() );
+            writer.begin_object( "interface_styles" );
+
+            for( const auto &language : languages )
+            {
+                writer.begin_object( language );
+
+                writer.write( "fonts", settings.interface_styles.at( language ).fonts );
+                writer.end_object();
+            }
+
+            writer.end_object();
         }
 
         void load_gameplay_visual( const utils::json::Value &root, GameplayVisualStyle &style )
@@ -178,6 +160,7 @@ namespace piko::managers
             }
 
             load_float( *visual, "trace_scale", style.trace_scale, 0.40f, 2.00f );
+
             load_float( *visual, "note_scale", style.note_scale, 0.50f, 1.80f );
 
             style.note_speed = GameplayVisualStyle{}.note_speed;
@@ -188,183 +171,534 @@ namespace piko::managers
                 GameplayVisualStyle::note_speed_maximum );
 
             load_float( *visual, "guard_note_scale", style.guard_note_scale, 0.50f, 1.50f );
+
             load_float( *visual, "guard_hit_pop_scale", style.guard_hit_pop_scale, 0.50f, 2.00f );
+
             load_float( *visual, "guard_hit_fade_scale", style.guard_hit_fade_scale, 0.50f, 2.00f );
+
             load_float( *visual, "guard_rail_scale", style.guard_rail_scale, 0.35f, 2.00f );
 
-            if( const auto *entry = visual->find( "aim_style" ); entry != nullptr )
-            {
-                style.aim_style = entry->string_or( "default" );
-            }
+            load_string( *visual, "aim_style", style.aim_style, "default" );
 
-            if( const utils::json::Value *entry = visual->find( "guard_icon_set" ); entry != nullptr )
-            {
-                style.guard_icon_set = entry->string_or();
-            }
-            else
-            {
-                style.guard_icon_set.clear();
-            }
+            load_string( *visual, "note_style", style.note_style, "default" );
 
-            if( const auto *entry = visual->find( "note_style" ); entry != nullptr )
-            {
-                style.note_style = entry->string_or( "default" );
-            }
+            style.guard_icon_set.clear();
+            load_string( *visual, "guard_icon_set", style.guard_icon_set );
 
-            const auto *centre_set = visual->find( "centre_icon_set" );
-            style.centre_icon_set = centre_set != nullptr ? centre_set->string_or() : std::string{};
+            style.centre_icon_set.clear();
+            load_string( *visual, "centre_icon_set", style.centre_icon_set );
 
-            load_float( *visual, "center_nub_scale", style.center_nub_scale, 0.25f, 2.00f );
-            load_float( *visual, "pressed_nub_scale", style.pressed_nub_scale, 0.25f, 2.00f );
+            load_float( *visual, "center_nub_scale", style.center_nub_scale,
+                GameplayVisualStyle::icon_scale_minimum, GameplayVisualStyle::icon_scale_maximum );
+
+            load_float( *visual, "pressed_nub_scale", style.pressed_nub_scale,
+                GameplayVisualStyle::icon_scale_minimum, GameplayVisualStyle::icon_scale_maximum );
 
             style.center_nub_scale = GameplayVisualStyle::snap_icon_scale( style.center_nub_scale );
 
             style.pressed_nub_scale = GameplayVisualStyle::snap_icon_scale( style.pressed_nub_scale );
 
             load_float( *visual, "cone_inner_diameter", style.cone_inner_diameter, 0.0f, 40.0f );
+
             load_float( *visual, "cone_length", style.cone_length, 60.0f, 240.0f );
+
             load_float( *visual, "cone_angle", style.cone_angle, 10.0f, 160.0f );
+
             load_float( *visual, "cone_line_width", style.cone_line_width, 1.0f, 8.0f );
 
             load_float( *visual, "cone_arrow_scale", style.cone_arrow_scale, 0.50f, 1.80f );
+
             load_float( *visual, "cone_arrow_width_scale", style.cone_arrow_width_scale, 0.35f, 1.50f );
+
             load_float( *visual, "cone_wing_spread_scale", style.cone_wing_spread_scale, 0.45f, 1.60f );
 
             load_float( *visual, "cone_wing_scale", style.cone_wing_scale, 0.50f, 1.80f );
+
             load_float( *visual, "cone_wing_width_scale", style.cone_wing_width_scale, 0.35f, 1.50f );
+
             load_float( *visual, "arrow_offset_x", style.arrow_offset_x, -60.00f, 60.00f );
+
             load_float( *visual, "wing_offset_x", style.wing_offset_x, -60.00f, 60.00f );
 
             load_color( *visual, "trace_idle_color", style.trace_idle_color );
+
             load_color( *visual, "trace_locked_color", style.trace_locked_color );
+
             load_color( *visual, "trace_lost_color", style.trace_lost_color );
+
             load_color( *visual, "note_color", style.note_color );
+
             load_color( *visual, "held_note_color", style.held_note_color );
+
             load_color( *visual, "guard_rail_color", style.guard_rail_color );
+
             load_color( *visual, "note_body_color", style.note_body_color );
+        }
+
+        void write_gameplay_visual( SettingsWriter &writer, const GameplayVisualStyle &style )
+        {
+            writer.begin_object( "gameplay_visual" );
+
+            writer.write( "trace_scale", style.trace_scale );
+
+            writer.write( "trace_idle_color", style.trace_idle_color );
+
+            writer.write( "trace_locked_color", style.trace_locked_color );
+
+            writer.write( "trace_lost_color", style.trace_lost_color );
+
+            writer.write( "note_style", style.note_style );
+
+            writer.write( "note_scale", style.note_scale );
+
+            writer.write( "note_speed", style.note_speed );
+
+            writer.write( "note_color", style.note_color );
+
+            writer.write( "held_note_color", style.held_note_color );
+
+            writer.write( "note_body_color", style.note_body_color );
+
+            writer.write( "guard_icon_set", style.guard_icon_set );
+
+            writer.write( "guard_note_scale", style.guard_note_scale );
+
+            writer.write( "guard_hit_pop_scale", style.guard_hit_pop_scale );
+
+            writer.write( "guard_hit_fade_scale", style.guard_hit_fade_scale );
+
+            writer.write( "guard_rail_scale", style.guard_rail_scale );
+
+            writer.write( "guard_rail_color", style.guard_rail_color );
+
+            writer.write( "centre_icon_set", style.centre_icon_set );
+
+            writer.write( "center_nub_scale", style.center_nub_scale );
+
+            writer.write( "pressed_nub_scale", style.pressed_nub_scale );
+
+            writer.write( "cone_inner_diameter", style.cone_inner_diameter );
+
+            writer.write( "cone_length", style.cone_length );
+
+            writer.write( "cone_angle", style.cone_angle );
+
+            writer.write( "cone_line_width", style.cone_line_width );
+
+            writer.write( "aim_style", style.aim_style );
+
+            writer.write( "cone_arrow_scale", style.cone_arrow_scale );
+
+            writer.write( "cone_arrow_width_scale", style.cone_arrow_width_scale );
+
+            writer.write( "arrow_offset_x", style.arrow_offset_x );
+
+            writer.write( "cone_wing_scale", style.cone_wing_scale );
+
+            writer.write( "cone_wing_width_scale", style.cone_wing_width_scale );
+
+            writer.write( "cone_wing_spread_scale", style.cone_wing_spread_scale );
+
+            writer.write( "wing_offset_x", style.wing_offset_x );
+
+            writer.end_object();
+        }
+
+        void load_snap_angles( const utils::json::Value &root,
+            const char *key,
+            std::array<float, utils::enum_index( AimDifficulty::Count )> &values )
+        {
+            const auto *angles = root.find( key );
+
+            if( angles == nullptr || !angles->is_object() )
+            {
+                return;
+            }
+
+            load_float( *angles, "easy", values[ utils::enum_index( AimDifficulty::Easy ) ], 5.0f, 80.0f );
+
+            load_float( *angles, "normal", values[ utils::enum_index( AimDifficulty::Normal ) ], 5.0f, 80.0f );
+
+            load_float( *angles, "master", values[ utils::enum_index( AimDifficulty::Master ) ], 5.0f, 80.0f );
         }
 
         void load_aim_settings( const utils::json::Value &root, GameSettings &settings )
         {
-            const auto *angles = root.find( "aim_snap_angles" );
+            load_snap_angles( root, "aim_snap_angles", settings.aim_snap_angles );
 
-            if( angles != nullptr && angles->is_object() )
-            {
-                load_float( *angles,
-                    "easy",
-                    settings.aim_snap_angles[ utils::enum_index( AimDifficulty::Easy ) ],
-                    5.0f,
-                    80.0f );
-
-                load_float( *angles,
-                    "normal",
-                    settings.aim_snap_angles[ utils::enum_index( AimDifficulty::Normal ) ],
-                    5.0f,
-                    80.0f );
-
-                load_float( *angles,
-                    "master",
-                    settings.aim_snap_angles[ utils::enum_index( AimDifficulty::Master ) ],
-                    5.0f,
-                    80.0f );
-            }
-
-            const auto *portable_angles = root.find( "psp_aim_snap_angles" );
-
-            if( portable_angles != nullptr && portable_angles->is_object() )
-            {
-                load_float( *portable_angles,
-                    "easy",
-                    settings.psp_aim_snap_angles[ utils::enum_index( AimDifficulty::Easy ) ],
-                    5.0f,
-                    80.0f );
-
-                load_float( *portable_angles,
-                    "normal",
-                    settings.psp_aim_snap_angles[ utils::enum_index( AimDifficulty::Normal ) ],
-                    5.0f,
-                    80.0f );
-
-                load_float( *portable_angles,
-                    "master",
-                    settings.psp_aim_snap_angles[ utils::enum_index( AimDifficulty::Master ) ],
-                    5.0f,
-                    80.0f );
-            }
+            load_snap_angles( root, "psp_aim_snap_angles", settings.psp_aim_snap_angles );
         }
 
-        void write_aim_settings( std::ostream &stream, const GameSettings &settings )
+        void write_snap_angles( SettingsWriter &writer,
+            const char *key,
+            const std::array<float, utils::enum_index( AimDifficulty::Count )> &values )
         {
-            stream << "  \"aim_snap_angles\": {\n";
-            stream << "    \"easy\": " << settings.snap_half_angle_for( AimDifficulty::Easy ) << ",\n";
-            stream << "    \"normal\": " << settings.snap_half_angle_for( AimDifficulty::Normal ) << ",\n";
-            stream << "    \"master\": " << settings.snap_half_angle_for( AimDifficulty::Master ) << "\n";
-            stream << "  },\n";
-            stream << "  \"psp_aim_snap_angles\": {\n";
-            stream << "    \"easy\": " << settings.psp_aim_snap_angles[ utils::enum_index( AimDifficulty::Easy ) ]
-                   << ",\n";
+            writer.begin_object( key );
+            writer.write( "easy", values[ utils::enum_index( AimDifficulty::Easy ) ] );
 
-            stream << "    \"normal\": " << settings.psp_aim_snap_angles[ utils::enum_index( AimDifficulty::Normal ) ]
-                   << ",\n";
+            writer.write( "normal", values[ utils::enum_index( AimDifficulty::Normal ) ] );
 
-            stream << "    \"master\": " << settings.psp_aim_snap_angles[ utils::enum_index( AimDifficulty::Master ) ]
-                   << "\n";
-
-            stream << "  },\n";
+            writer.write( "master", values[ utils::enum_index( AimDifficulty::Master ) ] );
+            writer.end_object();
         }
 
-        void write_gameplay_visual( std::ostream &stream, const GameplayVisualStyle &style )
+        void write_aim_settings( SettingsWriter &writer, const GameSettings &settings )
         {
-            stream << "  \"gameplay_visual\": {\n";
-            stream << "    \"trace_scale\": " << style.trace_scale << ",\n";
-            stream << "    \"note_scale\": " << style.note_scale << ",\n";
-            stream << "    \"note_speed\": " << style.note_speed << ",\n";
-            stream << "    \"guard_note_scale\": " << style.guard_note_scale << ",\n";
-            stream << "    \"guard_hit_pop_scale\": " << style.guard_hit_pop_scale << ",\n";
-            stream << "    \"guard_hit_fade_scale\": " << style.guard_hit_fade_scale << ",\n";
-            stream << "    \"guard_rail_scale\": " << style.guard_rail_scale << ",\n";
-            stream << "    \"aim_style\": ";
-            write_json_string( stream, style.aim_style );
-            stream << ",\n";
-            stream << "    \"guard_icon_set\": ";
-            write_json_string( stream, style.guard_icon_set );
-            stream << ",\n";
-            stream << "    \"centre_icon_set\": ";
-            write_json_string( stream, style.centre_icon_set );
-            stream << ",\n";
+            write_snap_angles( writer, "aim_snap_angles", settings.aim_snap_angles );
+            write_snap_angles( writer, "psp_aim_snap_angles", settings.psp_aim_snap_angles );
+        }
 
-            stream << "    \"note_style\": ";
-            write_json_string( stream, style.note_style );
-            stream << ",\n";
+        void load_cone_colors( const utils::json::Value &root, GameSettings &settings )
+        {
+            load_color( root, "view_cone_on_target_line_color", settings.view_cone_on_target_line_color );
 
-            stream << "    \"center_nub_scale\": " << style.center_nub_scale << ",\n";
-            stream << "    \"pressed_nub_scale\": " << style.pressed_nub_scale << ",\n";
-            stream << "    \"cone_inner_diameter\": " << style.cone_inner_diameter << ",\n";
-            stream << "    \"cone_length\": " << style.cone_length << ",\n";
-            stream << "    \"cone_angle\": " << style.cone_angle << ",\n";
-            stream << "    \"cone_line_width\": " << style.cone_line_width << ",\n";
-            stream << "    \"cone_arrow_scale\": " << style.cone_arrow_scale << ",\n";
-            stream << "    \"cone_arrow_width_scale\": " << style.cone_arrow_width_scale << ",\n";
-            stream << "    \"cone_wing_spread_scale\": " << style.cone_wing_spread_scale << ",\n";
-            stream << "    \"cone_wing_scale\": " << style.cone_wing_scale << ",\n";
-            stream << "    \"cone_wing_width_scale\": " << style.cone_wing_width_scale << ",\n";
-            stream << "    \"arrow_offset_x\": " << style.arrow_offset_x << ",\n";
-            stream << "    \"wing_offset_x\": " << style.wing_offset_x << ",\n";
-            stream << "    \"trace_idle_color\": ";
-            write_color( stream, style.trace_idle_color );
-            stream << ",\n    \"trace_locked_color\": ";
-            write_color( stream, style.trace_locked_color );
-            stream << ",\n    \"trace_lost_color\": ";
-            write_color( stream, style.trace_lost_color );
-            stream << ",\n    \"note_color\": ";
-            write_color( stream, style.note_color );
-            stream << ",\n    \"held_note_color\": ";
-            write_color( stream, style.held_note_color );
-            stream << ",\n    \"guard_rail_color\": ";
-            write_color( stream, style.guard_rail_color );
-            stream << ",\n    \"note_body_color\": ";
-            write_color( stream, style.note_body_color );
-            stream << "\n  },\n";
+            load_color( root, "view_cone_off_target_line_color", settings.view_cone_off_target_line_color );
+
+            load_color( root, "view_cone_on_target_fill_color", settings.view_cone_on_target_fill_color );
+
+            load_color( root, "view_cone_off_target_fill_color", settings.view_cone_off_target_fill_color );
+        }
+
+        void write_cone_colors( SettingsWriter &writer, const GameSettings &settings )
+        {
+            writer.write( "view_cone_on_target_line_color", settings.view_cone_on_target_line_color );
+
+            writer.write( "view_cone_off_target_line_color", settings.view_cone_off_target_line_color );
+
+            writer.write( "view_cone_on_target_fill_color", settings.view_cone_on_target_fill_color );
+
+            writer.write( "view_cone_off_target_fill_color", settings.view_cone_off_target_fill_color );
+        }
+
+        void load_graphics( const utils::json::Value &root, GameSettings &settings )
+        {
+            load_bool( root, "msaa_enabled", settings.msaa_enabled );
+
+            load_int( root, "msaa_samples", settings.msaa_samples, 0, 16 );
+
+            load_int( root, "window_width", settings.window_width, 640, 7680 );
+
+            load_int( root, "window_height", settings.window_height, 360, 4320 );
+
+            load_int( root, "render_resolution_percent", settings.render_resolution_percent, 25, 200 );
+
+            load_bool( root, "per_pixel_lighting", settings.per_pixel_lighting );
+
+            load_enum( root, "texture_filtering_mode", settings.texture_filtering_mode,
+                TextureFilteringMode::Nearest, TextureFilteringMode::Anisotropic );
+
+            load_float( root, "texture_anisotropy", settings.texture_anisotropy, 1.0f, 16.0f );
+
+            load_enum( root, "bloom_preset", settings.bloom_preset,
+                BloomPreset::Off, BloomPreset::High );
+
+            load_bool( root, "crt_filter_enabled", settings.crt_filter_enabled );
+
+            load_float( root, "crt_scanline_strength", settings.crt_scanline_strength, 0.0f, 1.0f );
+
+            load_float( root, "crt_vignette_strength", settings.crt_vignette_strength, 0.0f, 1.0f );
+
+            load_float( root, "crt_noise_strength", settings.crt_noise_strength, 0.0f, 1.0f );
+        }
+
+        void write_graphics( SettingsWriter &writer, const GameSettings &settings )
+        {
+            writer.write( "msaa_enabled", settings.msaa_enabled );
+
+            writer.write( "msaa_samples", settings.msaa_samples );
+
+            writer.write( "window_width", settings.window_width );
+
+            writer.write( "window_height", settings.window_height );
+
+            writer.write( "render_resolution_percent", settings.render_resolution_percent );
+
+            writer.write( "per_pixel_lighting", settings.per_pixel_lighting );
+
+            writer.write( "texture_filtering_mode", settings.texture_filtering_mode );
+
+            writer.write( "texture_anisotropy", settings.texture_anisotropy );
+
+            writer.write( "bloom_preset", settings.bloom_preset );
+
+            writer.write( "crt_filter_enabled", settings.crt_filter_enabled );
+
+            writer.write( "crt_scanline_strength", settings.crt_scanline_strength );
+
+            writer.write( "crt_vignette_strength", settings.crt_vignette_strength );
+
+            writer.write( "crt_noise_strength", settings.crt_noise_strength );
+        }
+
+        void load_game_data( const utils::json::Value &root, GameSettings &settings )
+        {
+            load_enum( root, "chart_style", settings.chart_style,
+                gamedata::ChartStyle::GitarooMan, gamedata::ChartStyle::GitarooManLives );
+
+            load_enum( root, "language", settings.language,
+                gamedata::GameLanguage::Default, gamedata::GameLanguage::German );
+
+            load_string( root, "ui_language", settings.ui_language, settings.ui_language );
+
+            load_int( root, "audio_import_compression", settings.audio_import_compression, 0, 1 );
+
+            load_bool( root, "play_movies", settings.play_movies );
+        }
+
+        void write_game_data( SettingsWriter &writer, const GameSettings &settings )
+        {
+            writer.write( "chart_style", settings.chart_style );
+
+            writer.write( "language", settings.language );
+
+            writer.write( "ui_language", settings.ui_language );
+
+            writer.write( "audio_import_compression", settings.audio_import_compression );
+
+            writer.write( "play_movies", settings.play_movies );
+        }
+
+        void load_audio( const utils::json::Value &root, GameSettings &settings )
+        {
+            load_bool( root, "stereo_audio", settings.stereo_audio );
+
+            load_bool( root, "background_fx_enabled", settings.background_fx_enabled );
+
+            load_int( root, "instrument_routing", settings.instrument_routing, 0, 2 );
+
+            load_enum( root, "instrument_playback", settings.instrument_playback,
+                runtime::audio::InstrumentPlaybackMode::Original, runtime::audio::InstrumentPlaybackMode::TraceEnd );
+        }
+
+        void write_audio( SettingsWriter &writer, const GameSettings &settings )
+        {
+            writer.write( "stereo_audio", settings.stereo_audio );
+
+            writer.write( "background_fx_enabled", settings.background_fx_enabled );
+
+            writer.write( "instrument_routing", settings.instrument_routing );
+
+            writer.write( "instrument_playback", settings.instrument_playback );
+        }
+
+        void load_controller( const utils::json::Value &root, GameSettings &settings )
+        {
+            load_enum( root, "controller_orientation", settings.controller_orientation,
+                ControllerOrientation::TypeA, ControllerOrientation::TypeC );
+
+            load_string( root, "input_device_name", settings.input_device_name );
+
+            load_bool( root, "mouse_controls_enabled", settings.mouse_controls_enabled );
+
+            load_bool( root, "guard_notes_accept_dpad", settings.guard_notes_accept_dpad );
+
+            load_int( root, "duet_chart_mode", settings.duet_chart_mode, 0, 3 );
+
+            load_bool( root, "always_retrigger_player_strum", settings.always_retrigger_player_strum );
+        }
+
+        void write_controller( SettingsWriter &writer, const GameSettings &settings )
+        {
+            writer.write( "controller_orientation", settings.controller_orientation );
+
+            writer.write( "input_device_name", settings.input_device_name );
+
+            writer.write( "mouse_controls_enabled", settings.mouse_controls_enabled );
+
+            writer.write( "guard_notes_accept_dpad", settings.guard_notes_accept_dpad );
+
+            writer.write( "duet_chart_mode", settings.duet_chart_mode );
+
+            writer.write( "always_retrigger_player_strum", settings.always_retrigger_player_strum );
+        }
+
+        void load_interface( const utils::json::Value &root, GameSettings &settings )
+        {
+            load_bool( root, "hide_battle_ui", settings.hide_battle_ui );
+
+            load_bool( root, "phrase_tube_wobble", settings.phrase_tube_wobble );
+
+            load_bool( root, "phrase_tube_gradient_pulse", settings.phrase_tube_gradient_pulse );
+
+            load_bool( root, "stage_bpm_edge_glow", settings.stage_bpm_edge_glow );
+
+            load_int( root, "phrase_note_color_index", settings.phrase_note_color_index, 0, 7 );
+
+            load_int( root, "phrase_note_held_color_index", settings.phrase_note_held_color_index, 0, 7 );
+
+            load_interface_styles( root, settings );
+
+            load_gameplay_visual( root, settings.gameplay_visual );
+
+            load_cone_colors( root, settings );
+        }
+
+        void write_interface( SettingsWriter &writer, const GameSettings &settings )
+        {
+            writer.write( "hide_battle_ui", settings.hide_battle_ui );
+
+            writer.write( "phrase_tube_wobble", settings.phrase_tube_wobble );
+
+            writer.write( "phrase_tube_gradient_pulse", settings.phrase_tube_gradient_pulse );
+
+            writer.write( "stage_bpm_edge_glow", settings.stage_bpm_edge_glow );
+
+            writer.write( "phrase_note_color_index", settings.phrase_note_color_index );
+
+            writer.write( "phrase_note_held_color_index", settings.phrase_note_held_color_index );
+
+            write_interface_styles( writer, settings );
+            write_gameplay_visual( writer, settings.gameplay_visual );
+            write_cone_colors( writer, settings );
+        }
+
+        void load_modifiers( const utils::json::Value &root, GameSettings &settings )
+        {
+            load_bool( root, "no_death_mode", settings.no_death_mode );
+
+            load_bool( root, "auto_press_mode", settings.auto_press_mode );
+
+            load_bool( root, "auto_aim_mode", settings.auto_aim_mode );
+
+            load_bool( root, "all_sections_mode", settings.all_sections_mode );
+
+            load_bool( root, "mirror_mode", settings.mirror_mode );
+
+            load_float( root, "player_damage_multiplier", settings.player_damage_multiplier, 0.0f, 4.0f );
+
+            load_float( root, "enemy_damage_multiplier", settings.enemy_damage_multiplier, 0.0f, 4.0f );
+
+            load_aim_settings( root, settings );
+        }
+
+        void write_modifiers( SettingsWriter &writer, const GameSettings &settings )
+        {
+            writer.write( "no_death_mode", settings.no_death_mode );
+
+            writer.write( "auto_press_mode", settings.auto_press_mode );
+
+            writer.write( "auto_aim_mode", settings.auto_aim_mode );
+
+            writer.write( "all_sections_mode", settings.all_sections_mode );
+
+            writer.write( "mirror_mode", settings.mirror_mode );
+
+            writer.write( "player_damage_multiplier", settings.player_damage_multiplier );
+
+            writer.write( "enemy_damage_multiplier", settings.enemy_damage_multiplier );
+
+            write_aim_settings( writer, settings );
+        }
+
+#if defined( _DEBUG )
+        void load_debug( const utils::json::Value &root, GameSettings &settings )
+        {
+            load_bool( root, "show_performance_overlay", settings.show_performance_overlay );
+
+            load_bool( root, "show_stage_debug_overlay", settings.show_stage_debug_overlay );
+
+            load_bool( root, "show_judgement_detail", settings.show_judgement_detail );
+
+            load_bool( root, "show_raw_energy_values", settings.show_raw_energy_values );
+
+            load_bool( root, "show_stage_audio_status", settings.show_stage_audio_status );
+        }
+
+        void write_debug( SettingsWriter &writer, const GameSettings &settings )
+        {
+            writer.write( "show_performance_overlay", settings.show_performance_overlay );
+
+            writer.write( "show_stage_debug_overlay", settings.show_stage_debug_overlay );
+
+            writer.write( "show_judgement_detail", settings.show_judgement_detail );
+
+            writer.write( "show_raw_energy_values", settings.show_raw_energy_values );
+
+            writer.write( "show_stage_audio_status", settings.show_stage_audio_status );
+        }
+#endif
+
+        void write_settings( SettingsWriter &writer, const GameSettings &settings )
+        {
+            writer.write( "version", GameSettings::file_version );
+            write_graphics( writer, settings );
+            write_game_data( writer, settings );
+            write_audio( writer, settings );
+            write_controller( writer, settings );
+            write_interface( writer, settings );
+            write_modifiers( writer, settings );
+#if defined( _DEBUG )
+            write_debug( writer, settings );
+#endif
+        }
+
+        void write_profile( SettingsWriter &writer, const GameSettings &settings )
+        {
+            writer.write( "version", GameSettings::visual_profile_version );
+            write_interface_styles( writer, settings );
+            write_gameplay_visual( writer, settings.gameplay_visual );
+            write_aim_settings( writer, settings );
+            writer.write( "guard_notes_accept_dpad", settings.guard_notes_accept_dpad );
+
+            writer.write( "chart_style", settings.chart_style );
+            write_cone_colors( writer, settings );
+        }
+
+        bool write_settings_file( const GameSettings &settings,
+            const std::filesystem::path &path,
+            void ( *write )( SettingsWriter &, const GameSettings & ),
+            std::string *error )
+        {
+            auto temporary = path;
+            temporary += ".tmp";
+            bool temporary_created = false;
+
+            try
+            {
+                if( !path.parent_path().empty() )
+                {
+                    std::filesystem::create_directories( path.parent_path() );
+                }
+
+                std::ofstream stream( temporary, std::ios::binary | std::ios::trunc );
+
+                if( !stream )
+                {
+                    throw std::runtime_error( "Could not open settings file for writing" );
+                }
+
+                temporary_created = true;
+                SettingsWriter writer( stream );
+                writer.begin_object();
+                write( writer, settings );
+                writer.end_object();
+                stream << '\n';
+                stream.close();
+
+                if( !stream )
+                {
+                    throw std::runtime_error( "Could not finish writing settings file" );
+                }
+
+                std::filesystem::rename( temporary, path );
+
+                return true;
+            }
+            catch( const std::exception &exception )
+            {
+                if( temporary_created )
+                {
+                    std::error_code remove_error;
+                    std::filesystem::remove( temporary, remove_error );
+                }
+
+                if( error != nullptr )
+                {
+                    *error = exception.what();
+                }
+
+                return false;
+            }
         }
     }
 
@@ -402,74 +736,7 @@ namespace piko::managers
 
     bool save_visual_profile( const GameSettings &settings, const std::filesystem::path &path, std::string *error )
     {
-        try
-        {
-            std::filesystem::create_directories( path.parent_path() );
-            auto temporary = path;
-            temporary += ".tmp";
-            std::ofstream stream( temporary, std::ios::binary | std::ios::trunc );
-
-            if( !stream )
-            {
-                throw std::runtime_error( "Could not open visual profile for writing" );
-            }
-
-            stream << std::fixed << std::setprecision( 6 );
-            stream << "{\n  \"version\": " << game_settings::visual_profile_version << ",\n";
-            game_settings::write_interface_styles( stream, settings );
-            game_settings::write_gameplay_visual( stream, settings.gameplay_visual );
-            game_settings::write_aim_settings( stream, settings );
-            stream << "  \"guard_notes_accept_dpad\": " << ( settings.guard_notes_accept_dpad ? "true" : "false" )
-                   << ",\n";
-
-            stream << "  \"chart_style\": " << utils::to_int( settings.chart_style ) << ",\n";
-            stream << "  \"view_cone_on_target_line_color\": ";
-            game_settings::write_color( stream, settings.view_cone_on_target_line_color );
-            stream << ",\n  \"view_cone_off_target_line_color\": ";
-            game_settings::write_color( stream, settings.view_cone_off_target_line_color );
-            stream << ",\n  \"view_cone_on_target_fill_color\": ";
-            game_settings::write_color( stream, settings.view_cone_on_target_fill_color );
-            stream << ",\n  \"view_cone_off_target_fill_color\": ";
-            game_settings::write_color( stream, settings.view_cone_off_target_fill_color );
-            stream << "\n}\n";
-            stream.close();
-
-            if( !stream )
-            {
-                throw std::runtime_error( "Could not finish writing visual profile" );
-            }
-
-            std::error_code rename_error;
-            std::filesystem::rename( temporary, path, rename_error );
-
-            if( rename_error )
-            {
-                auto backup = path;
-                backup += ".backup";
-                std::filesystem::copy_file( path, backup, std::filesystem::copy_options::overwrite_existing );
-                std::filesystem::remove( path );
-                std::filesystem::rename( temporary, path, rename_error );
-
-                if( rename_error )
-                {
-                    std::filesystem::rename( backup, path );
-                    throw std::runtime_error( "Could not replace visual profile" );
-                }
-
-                std::filesystem::remove( backup );
-            }
-
-            return true;
-        }
-        catch( const std::exception &exception )
-        {
-            if( error != nullptr )
-            {
-                *error = exception.what();
-            }
-
-            return false;
-        }
+        return write_settings_file( settings, path, write_profile, error );
     }
 
     bool load_visual_profile( GameSettings &settings, const std::filesystem::path &path, std::string *error )
@@ -485,29 +752,23 @@ namespace piko::managers
             }
 
             GameSettings loaded = settings;
-            game_settings::load_interface_styles( root, loaded );
+            load_interface_styles( root, loaded );
 
-            if( root.require( "version" ).integer_or( 0 ) != game_settings::visual_profile_version )
+            if( root.require( "version" ).integer_or( 0 ) != GameSettings::visual_profile_version )
             {
                 throw std::runtime_error( "Unsupported visual profile format" );
             }
 
-            game_settings::load_gameplay_visual( root, loaded.gameplay_visual );
-            game_settings::load_aim_settings( root, loaded );
+            load_gameplay_visual( root, loaded.gameplay_visual );
 
-            game_settings::load_bool( root, "guard_notes_accept_dpad", loaded.guard_notes_accept_dpad );
-            std::int32_t chart_style = utils::to_int( loaded.chart_style );
-            game_settings::load_int( root, "chart_style", chart_style, 0, 1 );
-            loaded.chart_style = utils::to_enum<gamedata::ChartStyle>( chart_style );
-            game_settings::load_color( root, "view_cone_on_target_line_color", loaded.view_cone_on_target_line_color );
-            game_settings::load_color( root,
-                "view_cone_off_target_line_color",
-                loaded.view_cone_off_target_line_color );
+            load_aim_settings( root, loaded );
 
-            game_settings::load_color( root, "view_cone_on_target_fill_color", loaded.view_cone_on_target_fill_color );
-            game_settings::load_color( root,
-                "view_cone_off_target_fill_color",
-                loaded.view_cone_off_target_fill_color );
+            load_bool( root, "guard_notes_accept_dpad", loaded.guard_notes_accept_dpad );
+
+            load_enum( root, "chart_style", loaded.chart_style,
+                gamedata::ChartStyle::GitarooMan, gamedata::ChartStyle::GitarooManLives );
+
+            load_cone_colors( root, loaded );
 
             settings = std::move( loaded );
             return true;
@@ -542,123 +803,27 @@ namespace piko::managers
                 throw std::runtime_error( "Settings root is not an object" );
             }
 
-            if( root.require( "version" ).integer_or( 0 ) != game_settings::settings_version )
+            if( root.require( "version" ).integer_or( 0 ) != GameSettings::file_version )
             {
                 throw std::runtime_error( "Unsupported settings format" );
             }
 
+            GameSettings loaded = settings;
+            load_graphics( root, loaded );
+
+            load_game_data( root, loaded );
+
+            load_audio( root, loaded );
+
+            load_controller( root, loaded );
+
+            load_interface( root, loaded );
+
+            load_modifiers( root, loaded );
 #if defined( _DEBUG )
-            game_settings::load_bool( root, "show_performance_overlay", settings.show_performance_overlay );
-            game_settings::load_bool( root, "show_stage_debug_overlay", settings.show_stage_debug_overlay );
-            game_settings::load_bool( root, "show_judgement_detail", settings.show_judgement_detail );
-            game_settings::load_bool( root, "show_raw_energy_values", settings.show_raw_energy_values );
-            game_settings::load_bool( root, "show_stage_audio_status", settings.show_stage_audio_status );
+            load_debug( root, loaded );
 #endif
-            game_settings::load_bool( root, "msaa_enabled", settings.msaa_enabled );
-            game_settings::load_int( root, "msaa_samples", settings.msaa_samples, 0, 16 );
-            game_settings::load_int( root, "window_width", settings.window_width, 640, 7680 );
-            game_settings::load_int( root, "window_height", settings.window_height, 360, 4320 );
-            game_settings::load_int( root, "render_resolution_percent", settings.render_resolution_percent, 25, 200 );
-
-            game_settings::load_bool( root, "per_pixel_lighting", settings.per_pixel_lighting );
-
-            std::int32_t filtering = utils::to_int( settings.texture_filtering_mode );
-            game_settings::load_int( root, "texture_filtering_mode", filtering, 0, 3 );
-            settings.texture_filtering_mode = utils::to_enum<TextureFilteringMode>( filtering );
-
-            game_settings::load_float( root, "texture_anisotropy", settings.texture_anisotropy, 1.0f, 16.0f );
-            std::int32_t bloom = utils::to_int( settings.bloom_preset );
-            game_settings::load_int( root, "bloom_preset", bloom, 0, utils::to_int( BloomPreset::Count ) - 1 );
-            settings.bloom_preset = utils::to_enum<BloomPreset>( bloom );
-
-            game_settings::load_bool( root, "crt_filter_enabled", settings.crt_filter_enabled );
-            game_settings::load_float( root, "crt_scanline_strength", settings.crt_scanline_strength, 0.0f, 1.0f );
-            game_settings::load_float( root, "crt_vignette_strength", settings.crt_vignette_strength, 0.0f, 1.0f );
-            game_settings::load_float( root, "crt_noise_strength", settings.crt_noise_strength, 0.0f, 1.0f );
-            std::int32_t chart_style = utils::to_int( settings.chart_style );
-            game_settings::load_int( root, "chart_style", chart_style, 0, 1 );
-            settings.chart_style = utils::to_enum<gamedata::ChartStyle>( chart_style );
-
-            std::int32_t language = utils::to_int( settings.language );
-            game_settings::load_int( root, "language", language, 0, 4 );
-            settings.language = utils::to_enum<gamedata::GameLanguage>( language );
-
-            if( const auto *entry = root.find( "ui_language" ); entry != nullptr && entry->is_string() )
-            {
-                settings.ui_language = entry->string();
-            }
-
-            game_settings::load_interface_styles( root, settings );
-
-            game_settings::load_int( root, "audio_import_compression", settings.audio_import_compression, 0, 1 );
-            game_settings::load_bool( root, "play_movies", settings.play_movies );
-            game_settings::load_bool( root, "stereo_audio", settings.stereo_audio );
-            game_settings::load_bool( root, "background_fx_enabled", settings.background_fx_enabled );
-            game_settings::load_int( root, "instrument_routing", settings.instrument_routing, 0, 2 );
-
-            std::int32_t instrument_playback = utils::to_int( settings.instrument_playback );
-            game_settings::load_int( root,
-                "instrument_playback",
-                instrument_playback,
-                0,
-                utils::to_int( runtime::audio::InstrumentPlaybackMode::Count ) - 1 );
-
-            settings.instrument_playback =
-                utils::to_enum<runtime::audio::InstrumentPlaybackMode>( instrument_playback );
-
-            std::int32_t orientation = utils::to_int( settings.controller_orientation );
-            game_settings::load_int( root, "controller_orientation", orientation, 0, 2 );
-            settings.controller_orientation = controller_orientation_from_index( orientation );
-
-            if( const utils::json::Value *device = root.find( "input_device_name" ); device != nullptr )
-            {
-                settings.input_device_name = device->string_or();
-            }
-
-            game_settings::load_bool( root, "mouse_controls_enabled", settings.mouse_controls_enabled );
-            game_settings::load_bool( root, "guard_notes_accept_dpad", settings.guard_notes_accept_dpad );
-            game_settings::load_bool( root, "always_retrigger_player_strum", settings.always_retrigger_player_strum );
-            game_settings::load_int( root, "duet_chart_mode", settings.duet_chart_mode, 0, 3 );
-            game_settings::load_bool( root, "phrase_tube_wobble", settings.phrase_tube_wobble );
-            game_settings::load_bool( root, "phrase_tube_gradient_pulse", settings.phrase_tube_gradient_pulse );
-            game_settings::load_bool( root, "stage_bpm_edge_glow", settings.stage_bpm_edge_glow );
-            game_settings::load_bool( root, "no_death_mode", settings.no_death_mode );
-            game_settings::load_bool( root, "only_aim_mode", settings.only_aim_mode );
-            game_settings::load_bool( root, "all_sections_mode", settings.all_sections_mode );
-            game_settings::load_bool( root, "mirror_mode", settings.mirror_mode );
-            game_settings::load_float( root,
-                "player_damage_multiplier",
-                settings.player_damage_multiplier,
-                0.0f,
-                4.0f );
-
-            game_settings::load_float( root, "enemy_damage_multiplier", settings.enemy_damage_multiplier, 0.0f, 4.0f );
-            game_settings::load_int( root, "phrase_note_color_index", settings.phrase_note_color_index, 0, 7 );
-            game_settings::load_int( root,
-                "phrase_note_held_color_index",
-                settings.phrase_note_held_color_index,
-                0,
-                7 );
-
-            game_settings::load_gameplay_visual( root, settings.gameplay_visual );
-            game_settings::load_aim_settings( root, settings );
-
-            game_settings::load_color( root,
-                "view_cone_on_target_line_color",
-                settings.view_cone_on_target_line_color );
-
-            game_settings::load_color( root,
-                "view_cone_off_target_line_color",
-                settings.view_cone_off_target_line_color );
-
-            game_settings::load_color( root,
-                "view_cone_on_target_fill_color",
-                settings.view_cone_on_target_fill_color );
-
-            game_settings::load_color( root,
-                "view_cone_off_target_fill_color",
-                settings.view_cone_off_target_fill_color );
-
+            settings = std::move( loaded );
             return true;
         }
         catch( const std::exception &exception )
@@ -674,127 +839,6 @@ namespace piko::managers
 
     bool save_game_settings( const GameSettings &settings, std::string *error )
     {
-        const std::filesystem::path path = game_settings_path();
-
-        try
-        {
-            std::error_code directory_error;
-            std::filesystem::create_directories( path.parent_path(), directory_error );
-
-            if( directory_error )
-            {
-                throw std::runtime_error( directory_error.message() );
-            }
-
-            std::ofstream stream( path, std::ios::binary | std::ios::trunc );
-
-            if( !stream )
-            {
-                throw std::runtime_error( "Could not open settings file for writing" );
-            }
-
-            stream << std::fixed << std::setprecision( 6 );
-            stream << "{\n";
-            stream << "  \"version\": " << game_settings::settings_version << ",\n";
-#if defined( _DEBUG )
-            stream << "  \"show_performance_overlay\": " << ( settings.show_performance_overlay ? "true" : "false" )
-                   << ",\n";
-
-            stream << "  \"show_stage_debug_overlay\": " << ( settings.show_stage_debug_overlay ? "true" : "false" )
-                   << ",\n";
-
-            stream << "  \"show_judgement_detail\": " << ( settings.show_judgement_detail ? "true" : "false" ) << ",\n";
-            stream << "  \"show_raw_energy_values\": " << ( settings.show_raw_energy_values ? "true" : "false" )
-                   << ",\n";
-
-            stream << "  \"show_stage_audio_status\": " << ( settings.show_stage_audio_status ? "true" : "false" )
-                   << ",\n";
-
-#endif
-
-            stream << "  \"msaa_enabled\": " << ( settings.msaa_enabled ? "true" : "false" ) << ",\n";
-            stream << "  \"msaa_samples\": " << settings.msaa_samples << ",\n";
-            stream << "  \"window_width\": " << settings.window_width << ",\n";
-            stream << "  \"window_height\": " << settings.window_height << ",\n";
-            stream << "  \"render_resolution_percent\": " << settings.render_resolution_percent << ",\n";
-            stream << "  \"per_pixel_lighting\": " << ( settings.per_pixel_lighting ? "true" : "false" ) << ",\n";
-            stream << "  \"texture_filtering_mode\": " << utils::to_int( settings.texture_filtering_mode ) << ",\n";
-
-            stream << "  \"texture_anisotropy\": " << settings.texture_anisotropy << ",\n";
-            stream << "  \"bloom_preset\": " << utils::to_int( settings.bloom_preset ) << ",\n";
-            stream << "  \"crt_filter_enabled\": " << ( settings.crt_filter_enabled ? "true" : "false" ) << ",\n";
-            stream << "  \"crt_scanline_strength\": " << settings.crt_scanline_strength << ",\n";
-            stream << "  \"crt_vignette_strength\": " << settings.crt_vignette_strength << ",\n";
-            stream << "  \"crt_noise_strength\": " << settings.crt_noise_strength << ",\n";
-            stream << "  \"chart_style\": " << utils::to_int( settings.chart_style ) << ",\n";
-            stream << "  \"language\": " << utils::to_int( settings.language ) << ",\n";
-            stream << "  \"ui_language\": ";
-            game_settings::write_json_string( stream, settings.ui_language );
-            stream << ",\n";
-            game_settings::write_interface_styles( stream, settings );
-
-            stream << "  \"audio_import_compression\": " << settings.audio_import_compression << ",\n";
-            stream << "  \"play_movies\": " << ( settings.play_movies ? "true" : "false" ) << ",\n";
-            stream << "  \"stereo_audio\": " << ( settings.stereo_audio ? "true" : "false" ) << ",\n";
-            stream << "  \"background_fx_enabled\": " << ( settings.background_fx_enabled ? "true" : "false" ) << ",\n";
-            stream << "  \"instrument_routing\": " << settings.instrument_routing << ",\n";
-
-            stream << "  \"instrument_playback\": " << utils::to_int( settings.instrument_playback ) << ",\n";
-            stream << "  \"controller_orientation\": " << utils::to_int( settings.controller_orientation ) << ",\n";
-
-            stream << "  \"input_device_name\": ";
-            game_settings::write_json_string( stream, settings.input_device_name );
-            stream << ",\n";
-            stream << "  \"mouse_controls_enabled\": " << ( settings.mouse_controls_enabled ? "true" : "false" )
-                   << ",\n";
-
-            stream << "  \"guard_notes_accept_dpad\": " << ( settings.guard_notes_accept_dpad ? "true" : "false" )
-                   << ",\n";
-
-            stream << "  \"always_retrigger_player_strum\": "
-                   << ( settings.always_retrigger_player_strum ? "true" : "false" ) << ",\n";
-
-            stream << "  \"duet_chart_mode\": " << settings.duet_chart_mode << ",\n";
-            stream << "  \"phrase_tube_wobble\": " << ( settings.phrase_tube_wobble ? "true" : "false" ) << ",\n";
-            stream << "  \"phrase_tube_gradient_pulse\": " << ( settings.phrase_tube_gradient_pulse ? "true" : "false" )
-                   << ",\n";
-
-            stream << "  \"stage_bpm_edge_glow\": " << ( settings.stage_bpm_edge_glow ? "true" : "false" ) << ",\n";
-            stream << "  \"no_death_mode\": " << ( settings.no_death_mode ? "true" : "false" ) << ",\n";
-            stream << "  \"only_aim_mode\": " << ( settings.only_aim_mode ? "true" : "false" ) << ",\n";
-            stream << "  \"all_sections_mode\": " << ( settings.all_sections_mode ? "true" : "false" ) << ",\n";
-            stream << "  \"mirror_mode\": " << ( settings.mirror_mode ? "true" : "false" ) << ",\n";
-            stream << "  \"player_damage_multiplier\": " << settings.player_damage_multiplier << ",\n";
-            stream << "  \"enemy_damage_multiplier\": " << settings.enemy_damage_multiplier << ",\n";
-            stream << "  \"phrase_note_color_index\": " << settings.phrase_note_color_index << ",\n";
-            stream << "  \"phrase_note_held_color_index\": " << settings.phrase_note_held_color_index << ",\n";
-            game_settings::write_gameplay_visual( stream, settings.gameplay_visual );
-            game_settings::write_aim_settings( stream, settings );
-            stream << "  \"view_cone_on_target_line_color\": ";
-            game_settings::write_color( stream, settings.view_cone_on_target_line_color );
-            stream << ",\n  \"view_cone_off_target_line_color\": ";
-            game_settings::write_color( stream, settings.view_cone_off_target_line_color );
-            stream << ",\n  \"view_cone_on_target_fill_color\": ";
-            game_settings::write_color( stream, settings.view_cone_on_target_fill_color );
-            stream << ",\n  \"view_cone_off_target_fill_color\": ";
-            game_settings::write_color( stream, settings.view_cone_off_target_fill_color );
-            stream << "\n}\n";
-
-            if( !stream )
-            {
-                throw std::runtime_error( "Could not finish writing settings file" );
-            }
-
-            return true;
-        }
-        catch( const std::exception &exception )
-        {
-            if( error != nullptr )
-            {
-                *error = exception.what();
-            }
-
-            return false;
-        }
+        return write_settings_file( settings, game_settings_path(), write_settings, error );
     }
 }

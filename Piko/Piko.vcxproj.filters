@@ -254,6 +254,9 @@
     <ClCompile Include="Managers\GameSettings.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="Managers\SettingsWriter.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
     <ClCompile Include="Managers\InputManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
@@ -560,6 +563,9 @@
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Managers\GameSettings.hpp">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\SettingsWriter.hpp">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Managers\InterfaceStyle.hpp">

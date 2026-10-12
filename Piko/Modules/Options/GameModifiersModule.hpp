@@ -30,7 +30,8 @@ namespace piko::modules
         enum class Row : std::int32_t
         {
             NoDeath,
-            OnlyAim,
+            AutoPress,
+            AutoAim,
             AllSections,
             Mirror,
             PlayerDamage,
@@ -50,7 +51,7 @@ namespace piko::modules
 
         static constexpr float reference_width = 1280.0f;
         static constexpr float reference_height = 720.0f;
-        static constexpr float row_height = 50.0f;
+        static constexpr float row_height = 48.0f;
         static constexpr float row_gap = 2.0f;
         static constexpr float label_text_size = 22.0f;
         static constexpr float value_text_size = 21.0f;
@@ -66,9 +67,10 @@ namespace piko::modules
         static constexpr float minimum_snap_angle = 5.0f;
         static constexpr float snap_angle_step = 0.5f;
         static constexpr std::int32_t snap_step_count = 151;
-        static constexpr std::array<Row, 9> main_rows{
+        static constexpr std::array<Row, 10> main_rows{
             Row::NoDeath,
-            Row::OnlyAim,
+            Row::AutoPress,
+            Row::AutoAim,
             Row::AllSections,
             Row::Mirror,
             Row::PlayerDamage,

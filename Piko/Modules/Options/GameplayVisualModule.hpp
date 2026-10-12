@@ -83,6 +83,7 @@ namespace piko::modules
         {
             AimEntry,
             MenuFont,
+            HideBattleUi,
             FontChoice,
             VisionConeEntry,
             NubEntry,

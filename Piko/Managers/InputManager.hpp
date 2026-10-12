@@ -111,7 +111,7 @@ namespace piko::managers
         [[nodiscard]] SDL_JoystickID selected_device() const;
         bool select_device( SDL_JoystickID id );
         void set_controller_orientation( ControllerOrientation orientation );
-        void set_battle_input( SDL_Window *window, bool enabled, bool allow_mouse_aim );
+        void set_battle_input( SDL_Window *window, bool enabled, bool allow_mouse_aim, bool allow_mouse_notes );
 
         // Type B uses the right stick
         [[nodiscard]] float left_stick_x() const;
@@ -238,6 +238,7 @@ namespace piko::managers
         bool battle_input_enabled_ = false;
         bool mouse_relative_mode_ = false;
         bool mouse_aim_allowed_ = false;
+        bool mouse_notes_allowed_ = false;
         bool mouse_aim_active_ = false;
         float mouse_aim_x_ = 0.0f;
         float mouse_aim_y_ = 0.0f;

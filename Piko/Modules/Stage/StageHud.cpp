@@ -221,9 +221,14 @@ namespace piko::modules
             append( "ND" );
         }
 
-        if( settings.only_aim_mode )
+        if( settings.auto_press_mode )
         {
-            append( "OA" );
+            append( "AP" );
+        }
+
+        if( settings.auto_aim_mode )
+        {
+            append( "AA" );
         }
 
         if( settings.all_sections_mode )
@@ -808,6 +813,11 @@ namespace piko::modules
         float pulse ) const
     {
         (void)pulse;
+
+        if( app.settings().hide_battle_ui )
+        {
+            return;
+        }
 
         if( tutorial_session() )
         {

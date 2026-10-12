@@ -492,7 +492,8 @@ namespace piko::runtime::stage
 
         no_death_mode_ = false;
 
-        only_aim_mode_ = false;
+        auto_press_mode_ = false;
+        auto_aim_mode_ = false;
 
         all_sections_mode_ = false;
 
@@ -500,6 +501,7 @@ namespace piko::runtime::stage
 
         enemy_damage_multiplier_ = 1.0f;
         section_visit_counts_.clear();
+        section_content_groups_.clear();
         branch_playback_.clear();
         forced_section_loop_index_.reset();
         reset_energy_on_forced_loop_ = false;
@@ -767,16 +769,25 @@ namespace piko::runtime::stage
     }
 
     void StageRuntime::set_game_modifiers( bool no_death,
-        bool only_aim,
+        bool auto_press,
+        bool auto_aim,
         bool all_sections,
         float player_damage_multiplier,
         float enemy_damage_multiplier )
     {
         no_death_mode_ = no_death;
 
-        only_aim_mode_ = only_aim;
+        auto_press_mode_ = auto_press;
+        auto_aim_mode_ = auto_aim;
 
         all_sections_mode_ = all_sections;
+
+        section_content_groups_.clear();
+
+        if( all_sections_mode_ && has_song() )
+        {
+            build_section_content_groups();
+        }
 
         player_damage_multiplier_ = std::clamp( player_damage_multiplier, 0.0f, 4.0f );
 
@@ -2188,6 +2199,7 @@ namespace piko::runtime::stage
         judgement_section_index_ = state_.section_index;
 
         last_judgement_update_section_sample_ = state_.section_sample;
+        judgement_input_received_ = false;
 
         judgement_debug_.section_index = state_.section_index;
 
@@ -2988,7 +3000,7 @@ namespace piko::runtime::stage
                 traces_active[ source ] = traces_active[ source ] || ( sample >= start && sample < end );
             }
 
-            const bool automatic = !manual || input.automatic_notes || only_aim_mode_;
+            const bool automatic = !manual || input.automatic_notes || auto_press_mode_;
             bool aligned = true;
 
             if( manual && !input.automatic_notes )
@@ -3512,12 +3524,69 @@ namespace piko::runtime::stage
         } );
     }
 
+    StageInputSnapshot StageRuntime::auto_aim_input( StageInputSnapshot input ) const
+    {
+        if( ( !auto_aim_mode_ && !input.automatic_notes ) || paused_ || !has_song() || state_.song_finished )
+        {
+            return input;
+        }
+
+        input.aim_x = 0.0f;
+        input.aim_y = 0.0f;
+        input.aim_strength = 0.0f;
+        const ActiveChart *target = nullptr;
+
+        for( const auto &chart : state_.active_charts )
+        {
+            if( chart.trace_samples == nullptr || chart.trace_samples->size() < 2 )
+            {
+                continue;
+            }
+
+            const auto &samples = *chart.trace_samples;
+
+            if( chart.chart_sample < samples.front().chart_sample || chart.chart_sample > samples.back().chart_sample )
+            {
+                continue;
+            }
+
+            if( target == nullptr )
+            {
+                target = &chart;
+            }
+
+            if( holding_phrase_for_chart( chart ) )
+            {
+                target = &chart;
+                break;
+            }
+        }
+
+        if( target == nullptr )
+        {
+            return input;
+        }
+
+        const auto position = trace_position_at( *target->trace_samples, target->chart_sample );
+        const float scale_x = std::copysign( std::max( std::abs( input.aim_target_scale_x ), 0.0001f ), input.aim_target_scale_x );
+        const float scale_y = std::max( std::abs( input.aim_target_scale_y ), 0.0001f );
+        const float target_x = std::cos( -position.angle ) * scale_x;
+        const float target_y = std::sin( -position.angle ) * scale_y;
+        const float length = std::max( std::hypot( target_x, target_y ), 0.0001f );
+
+        input.aim_x = target_x / length;
+        input.aim_y = target_y / length;
+        input.aim_strength = 1.0f;
+
+        return input;
+    }
+
     float StageRuntime::aim_alignment_for_chart_sample( const std::vector<TraceSample> &samples,
         std::int64_t chart_sample,
         const StageInputSnapshot &input ) const
     {
 
-        if( input.automatic_notes )
+        if( auto_aim_mode_ || input.automatic_notes )
         {
             return 1.0f;
         }
@@ -3566,7 +3635,7 @@ namespace piko::runtime::stage
 
     void StageRuntime::update_judgement( const StageInputSnapshot &raw_input )
     {
-        StageInputSnapshot input = raw_input;
+        StageInputSnapshot input = auto_aim_input( raw_input );
         judgement_debug_.enabled = true;
 
         judgement_debug_.aim_x = input.aim_x;
@@ -3632,12 +3701,18 @@ namespace piko::runtime::stage
             }
         }
 
-        const std::int64_t previous_judgement_section_sample =
+        const bool automatic_press = auto_press_mode_ || input.automatic_notes;
+        std::int64_t previous_judgement_section_sample =
             std::min( last_judgement_update_section_sample_, state_.section_sample );
+
+        if( automatic_press && !judgement_input_received_ )
+        {
+            previous_judgement_section_sample = 0;
+        }
 
         const std::int64_t current_judgement_section_sample = state_.section_sample;
 
-        if( only_aim_mode_ || input.automatic_notes )
+        if( automatic_press )
         {
             input.events.clear();
             input.action_pressed = false;
@@ -3699,6 +3774,7 @@ namespace piko::runtime::stage
         }
 
         last_judgement_update_section_sample_ = state_.section_sample;
+        judgement_input_received_ = true;
 
         const std::int64_t phrase_start_window_samples = chart_style_ == gamedata::ChartStyle::GitarooManLives
                                                              ? StageInstrumentState::psp_hit_window_samples
@@ -4358,43 +4434,347 @@ namespace piko::runtime::stage
         return merge;
     }
 
-    std::size_t StageRuntime::next_unplayed_section( std::size_t start ) const
+    bool StageRuntime::sections_match( std::size_t first, std::size_t second, bool ordered_repeat ) const
+    {
+        const auto &song = *runtime_song_.song;
+
+        if( first >= song.sections.size() || second >= song.sections.size() ||
+            first >= song.cues.size() || second >= song.cues.size() )
+        {
+            return false;
+        }
+
+        const auto &left_cue = song.cues[ first ];
+        const auto &right_cue = song.cues[ second ];
+
+        const auto &left_audio = left_cue.audio_section_name.empty() ? left_cue.fallback_name
+                                                                   : left_cue.audio_section_name;
+
+        const auto &right_audio = right_cue.audio_section_name.empty() ? right_cue.fallback_name
+                                                                     : right_cue.audio_section_name;
+
+        if( left_audio.empty() || right_audio.empty() )
+        {
+            return false;
+        }
+
+        const bool same_audio = left_audio == right_audio;
+        const bool loop_suffix = ( left_audio.back() == 'T' && right_audio.back() == 'L' ) ||
+                                 ( left_audio.back() == 'L' && right_audio.back() == 'T' );
+
+        // Dirty match
+        const bool matching_loop =
+            left_audio.size() == right_audio.size() && left_audio.size() > 1
+            && left_audio.compare( 0, left_audio.size() - 1, right_audio, 0, right_audio.size() - 1 ) == 0
+            && loop_suffix;
+
+        if( ( !same_audio && !matching_loop ) || ( same_audio && ordered_repeat ) )
+        {
+            return false;
+        }
+
+        const auto &left = song.sections[ first ];
+        const auto &right = song.sections[ second ];
+
+        if( section_action_mode( first ) == StageActionMode::Charge ||
+            left.battle_phase != right.battle_phase || left.tempo != right.tempo ||
+            left.duration_samples != right.duration_samples || left.player_count != right.player_count ||
+            left.charts_per_player != right.charts_per_player )
+        {
+            return false;
+        }
+
+        const bool has_notes = std::any_of( left.charts.begin(), left.charts.end(), []( const auto &chart )
+            {
+                return !chart.phrases.empty() || !chart.guards.empty();
+            } );
+
+        if( !has_notes )
+        {
+            return false;
+        }
+
+        // One chart per cue, even when its alternate notes differ!
+        if( same_audio )
+        {
+            return true;
+        }
+
+        if( left.charts.size() != right.charts.size() )
+        {
+            return false;
+        }
+
+        const bool same_tempo_changes = std::equal( left.tempo_changes.begin(),
+            left.tempo_changes.end(),
+            right.tempo_changes.begin(),
+            right.tempo_changes.end(),
+            []( const auto &a, const auto &b )
+            {
+                return a.start_sample == b.start_sample && a.tempo == b.tempo;
+            } );
+
+        if( !same_tempo_changes )
+        {
+            return false;
+        }
+
+        // Routing can differ even while the notes and music are identical 
+        for( std::size_t index = 0; index < left.charts.size(); ++index )
+        {
+            const auto &a = left.charts[ index ];
+            const auto &b = right.charts[ index ];
+
+            if( a.start_sample != b.start_sample || a.end_sample != b.end_sample )
+            {
+                return false;
+            }
+
+            const bool same_traces = std::equal( a.traces.begin(), a.traces.end(), b.traces.begin(), b.traces.end(),
+                []( const auto &x, const auto &y )
+                {
+                    return x.start_sample == y.start_sample
+                        && x.duration_samples == y.duration_samples
+                        && x.stored_angle == y.stored_angle
+                        && x.curve == y.curve;
+                } );
+
+            const bool same_phrases = std::equal( a.phrases.begin(), a.phrases.end(), b.phrases.begin(), b.phrases.end(),
+                []( const auto &x, const auto &y )
+                {
+                    return x.start_sample == y.start_sample
+                        && x.duration_samples == y.duration_samples
+                        && x.phrase_start == y.phrase_start
+                        && x.phrase_end == y.phrase_end;
+                } );
+
+            const bool same_guards = std::equal( a.guards.begin(), a.guards.end(), b.guards.begin(), b.guards.end(),
+                []( const auto &x, const auto &y )
+                {
+                    return x.start_sample == y.start_sample && x.button == y.button;
+                } );
+
+            if( !same_traces || !same_phrases || !same_guards )
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    void StageRuntime::build_section_content_groups()
+    {
+        const std::size_t terminal = runtime_song_.sections.size();
+        section_content_groups_.resize( terminal );
+
+        for( std::size_t section = 0; section < terminal; ++section )
+        {
+            section_content_groups_[ section ] = section;
+        }
+
+        for( std::size_t section = 0; section < terminal; ++section )
+        {
+            const auto &conditions = runtime_song_.song->sections[ section ].conditions;
+            const bool random_branch = std::any_of( conditions.begin(), conditions.end(), []( const auto &condition )
+                {
+                    return condition.type == 3u;
+                } );
+
+            if( !random_branch )
+            {
+                continue;
+            }
+
+            const auto routes = condition_resolver_.collect_possible_next_sections( *runtime_song_.song, section );
+
+            if( routes.size() < 2 )
+            {
+                continue;
+            }
+
+            const std::size_t merge = branch_merge_section( routes );
+            std::vector<bool> seen( terminal, false );
+            std::vector<std::size_t> members;
+
+            const auto add_section = [ & ]( std::size_t next )
+            {
+                if( next < terminal && next != merge && !seen[ next ] )
+                {
+                    seen[ next ] = true;
+                    members.push_back( next );
+                }
+            };
+
+            for( const std::size_t route : routes )
+            {
+                add_section( route );
+            }
+
+            for( std::size_t head = 0; head < members.size(); ++head )
+            {
+                const auto &next_sections =
+                    condition_resolver_.collect_possible_next_sections( *runtime_song_.song, members[ head ] );
+
+                for( const std::size_t next : next_sections )
+                {
+                    add_section( next );
+                }
+            }
+
+            std::vector<std::vector<bool>> reachable( terminal, std::vector<bool>( terminal, false ) );
+
+            for( const std::size_t start : members )
+            {
+                std::vector<std::size_t> queue{
+                    start
+                };
+
+                reachable[ start ][ start ] = true;
+
+                for( std::size_t head = 0; head < queue.size(); ++head )
+                {
+                    for( const std::size_t next :
+                        condition_resolver_.collect_possible_next_sections( *runtime_song_.song, queue[ head ] ) )
+                    {
+                        if( next < terminal && seen[ next ] && !reachable[ start ][ next ] )
+                        {
+                            reachable[ start ][ next ] = true;
+                            queue.push_back( next );
+                        }
+                    }
+                }
+            }
+
+            for( std::size_t a = 0; a < members.size(); ++a )
+            {
+                for( std::size_t b = a + 1; b < members.size(); ++b )
+                {
+                    const std::size_t first_group = section_content_groups_[ members[ a ] ];
+                    const std::size_t second_group = section_content_groups_[ members[ b ] ];
+
+                    // Keep repeats of the same cue
+                    const bool ordered_repeat =
+                        reachable[ members[ a ] ][ members[ b ] ] != reachable[ members[ b ] ][ members[ a ] ];
+
+                    if( first_group == second_group ||
+                        !sections_match( members[ a ], members[ b ], ordered_repeat ) )
+                    {
+                        continue;
+                    }
+
+                    const std::size_t group = std::min( first_group, second_group );
+
+                    for( auto &existing : section_content_groups_ )
+                    {
+                        if( existing == first_group || existing == second_group )
+                        {
+                            existing = group;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Loop copies can be beyond a branch's shared section
+        for( std::size_t first = 0; first < terminal; ++first )
+        {
+            for( std::size_t second = first + 1; second < terminal; ++second )
+            {
+                if( !sections_match( first, second, true ) )
+                {
+                    continue;
+                }
+
+                const std::size_t first_group = section_content_groups_[ first ];
+                const std::size_t second_group = section_content_groups_[ second ];
+                const std::size_t group = std::min( first_group, second_group );
+
+                for( auto &existing : section_content_groups_ )
+                {
+                    if( existing == first_group || existing == second_group )
+                    {
+                        existing = group;
+                    }
+                }
+            }
+        }
+    }
+
+    bool StageRuntime::section_was_played( std::size_t section ) const
+    {
+        if( section >= section_visit_counts_.size() || section_visit_counts_[ section ] != 0u )
+        {
+            return true;
+        }
+
+        if( section >= section_content_groups_.size() )
+        {
+            return false;
+        }
+
+        const std::size_t group = section_content_groups_[ section ];
+
+        for( std::size_t other = 0; other < section_content_groups_.size(); ++other )
+        {
+            if( section_content_groups_[ other ] == group && section_visit_counts_[ other ] != 0u )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    std::size_t StageRuntime::next_unplayed_section( std::size_t start, std::size_t stop ) const
     {
         const std::size_t terminal = runtime_song_.sections.size();
 
         if( start >= terminal )
         {
-            return terminal;
+            return stop;
         }
 
-        std::vector<bool> seen( terminal, false );
-        std::vector<std::size_t> queue{
-            start
-        };
+        std::vector<std::array<bool, 2>> seen( terminal );
+        std::vector<std::pair<std::size_t, bool>> queue { { start, false } };
 
-        seen[ start ] = true;
+        seen[ start ][ 0 ] = true;
 
         for( std::size_t head = 0; head < queue.size(); ++head )
         {
-            const std::size_t section = queue[ head ];
+            const auto [ section, skip_charge ] = queue[ head ];
 
-            if( section_visit_counts_[ section ] == 0u )
+            if( section == stop )
+            {
+                continue;
+            }
+
+            const bool played = section_was_played( section );
+            const StageActionMode mode = section_action_mode( section );
+
+            if( !played && !( skip_charge && mode == StageActionMode::Charge ) )
             {
                 return section;
             }
 
-            for( const std::size_t next :
-                condition_resolver_.collect_possible_next_sections( *runtime_song_.song, section ) )
+            // Skip the charge belonging to an attack copy that we skipped. This helps prevent some harsh cuts in stage 10
+            const bool skip_next_charge = skip_charge || ( played && mode == StageActionMode::Attack );
+            const std::size_t path_index = skip_next_charge ? 1u : 0u;
+
+             const auto &next_sections =
+                condition_resolver_.collect_possible_next_sections( *runtime_song_.song, state_.section_index );
+
+            for( const std::size_t next : next_sections )
             {
-                if( next < terminal && !seen[ next ] )
+                if( next < terminal && !seen[ next ][ path_index ] )
                 {
-                    seen[ next ] = true;
-                    queue.push_back( next );
+                    seen[ next ][ path_index ] = true;
+                    queue.emplace_back( next, skip_next_charge );
                 }
             }
         }
 
-        return terminal;
+        return stop;
     }
 
     void StageRuntime::invalidate_transition_prediction()
@@ -4441,26 +4821,28 @@ namespace piko::runtime::stage
 
         if( all_sections_mode_ )
         {
+            const std::size_t terminal = runtime_song_.sections.size();
             StageSectionTransition &next = transition_plan_.predicted_transition;
 
             if( !next.song_finished )
             {
-                for( const std::size_t route :
-                    condition_resolver_.collect_possible_next_sections( *runtime_song_.song, state_.section_index ) )
+                const std::size_t stop = branch_playback_.empty() ? terminal : branch_playback_.back().merge_section;
+                std::size_t unplayed = next_unplayed_section( next.next_section_index, stop );
+
+                const auto &next_sections =
+                    condition_resolver_.collect_possible_next_sections( *runtime_song_.song, state_.section_index );
+
+                for( const std::size_t route : next_sections )
                 {
-                    if( route < next.next_section_index && route < section_visit_counts_.size() &&
-                        section_visit_counts_[ route ] == 0u )
+                    const std::size_t candidate = next_unplayed_section( route, stop );
+
+                    if( candidate < terminal && candidate != stop && ( unplayed == stop || candidate < unplayed ) )
                     {
-                        next.next_section_index = route;
+                        unplayed = candidate;
                     }
                 }
-            }
 
-            if( !next.song_finished && next.next_section_index < section_visit_counts_.size() &&
-                section_visit_counts_[ next.next_section_index ] != 0u )
-            {
-                const std::size_t unplayed = next_unplayed_section( next.next_section_index );
-                next = StageSectionTransition{ unplayed >= runtime_song_.sections.size(), unplayed };
+                next = StageSectionTransition{ unplayed >= terminal, unplayed };
             }
 
             for( std::size_t depth = branch_playback_.size(); depth > 0; --depth )
@@ -4468,24 +4850,37 @@ namespace piko::runtime::stage
                 const std::size_t index = depth - 1;
                 const BranchPlayback &branch = branch_playback_[ index ];
 
-                if( !next.song_finished && next.next_section_index != branch.merge_section )
+                const bool charge_merge = section_action_mode( branch.merge_section ) == StageActionMode::Charge;
+                const bool leaving_charge = charge_merge && state_.section_index == branch.merge_section;
+
+                if( !leaving_charge && !next.song_finished && next.next_section_index != branch.merge_section )
+                {
+                    break;
+                }
+
+                // Play the shared charge before starting another route. This helps prevent harsh cuts in stage 10
+                if( charge_merge && !leaving_charge && !next.song_finished )
                 {
                     break;
                 }
 
                 std::size_t route = branch.current_route + 1;
-                while( route < branch.routes.size() && section_visit_counts_[ branch.routes[ route ] ] != 0u )
+
+                for( ; route < branch.routes.size(); ++route )
                 {
-                    ++route;
+                    const std::size_t unplayed = next_unplayed_section( branch.routes[ route ], branch.merge_section );
+
+                    if( unplayed < terminal && unplayed != branch.merge_section )
+                    {
+                        next = StageSectionTransition{ false, unplayed };
+                        predicted_branch_advance_index_ = index;
+                        predicted_branch_advance_route_index_ = route;
+                        break;
+                    }
                 }
 
-                if( route < branch.routes.size() )
+                if( predicted_branch_advance_index_.has_value() )
                 {
-                    next = StageSectionTransition{ false, branch.routes[ route ] };
-
-                    predicted_branch_advance_index_ = index;
-
-                    predicted_branch_advance_route_index_ = route;
                     break;
                 }
 
@@ -4494,31 +4889,30 @@ namespace piko::runtime::stage
 
             if( !predicted_branch_advance_index_.has_value() && predicted_branch_complete_count_ == 0 )
             {
-                std::vector<std::size_t> routes =
-                    condition_resolver_.collect_possible_next_sections( *runtime_song_.song, state_.section_index );
+                auto next_sections = condition_resolver_.collect_possible_next_sections( *runtime_song_.song,
+                    state_.section_index );
 
-                routes.erase( std::remove_if( routes.begin(),
-                                  routes.end(),
-                                  [ this ]( std::size_t route )
-                                  {
-                                      return route >= section_visit_counts_.size() ||
-                                             section_visit_counts_[ route ] != 0u;
-                                  } ),
-                    routes.end() );
-                const bool random_branch =
-                    std::any_of( runtime_song_.song->sections[ state_.section_index ].conditions.begin(),
-                        runtime_song_.song->sections[ state_.section_index ].conditions.end(),
-                        []( const filetypes::chc::Condition &condition )
-                        {
-                            return condition.type == 3u;
-                        } );
-                if( random_branch && routes.size() > 1 && branch_playback_.size() < 8 )
+                const auto &conditions = runtime_song_.song->sections[ state_.section_index ].conditions;
+                const bool random_branch = std::any_of( conditions.begin(), conditions.end(), []( const auto &condition )
+                    {
+                        return condition.type == 3u;
+                    } );
+
+                if( random_branch && next_sections.size() > 1 && branch_playback_.size() < 8 )
                 {
-                    const std::size_t merge = branch_merge_section( routes );
-                    predicted_branch_start_ = BranchPlayback{ std::move( routes ), merge, 0 };
+                    const std::size_t merge = branch_merge_section( next_sections );
 
-                    transition_plan_.predicted_transition =
-                        StageSectionTransition{ false, predicted_branch_start_->routes.front() };
+                    for( std::size_t route = 0; route < next_sections.size(); ++route )
+                    {
+                        const std::size_t unplayed = next_unplayed_section( next_sections[ route ], merge );
+
+                        if( unplayed < terminal && unplayed != merge )
+                        {
+                            predicted_branch_start_ = BranchPlayback{ std::move( next_sections ), merge, route };
+                            next = StageSectionTransition{ false, unplayed };
+                            break;
+                        }
+                    }
                 }
             }
         }
