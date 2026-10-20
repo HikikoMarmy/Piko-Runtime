@@ -195,7 +195,9 @@ namespace piko::modules::stage
     void draw_darkened_phrase_overlay( rendering::Renderer &renderer,
         const std::vector<rendering::Vec2> &raw_points,
         const runtime::stage::StageGameplayView &view,
-        bool draw_begin_icon );
+        bool draw_begin_icon,
+        float note_alpha,
+        float body_alpha );
 
     void apply_phrase_tube_wobble( std::vector<runtime::stage::TraceScreenPoint> &points,
         std::int64_t group_start_sample,

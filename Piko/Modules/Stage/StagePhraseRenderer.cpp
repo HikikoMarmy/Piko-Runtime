@@ -51,7 +51,7 @@ namespace piko::modules::stage
             std::clamp( base.r * 1.22f + 0.10f, 0.0f, 1.0f ),
             std::clamp( base.g * 1.22f + 0.10f, 0.0f, 1.0f ),
             std::clamp( base.b * 1.22f + 0.10f, 0.0f, 1.0f ),
-            alpha
+            alpha * base.a
         };
     }
 
@@ -73,9 +73,10 @@ namespace piko::modules::stage
     void draw_phrase_tube_fill_ribbon( rendering::Renderer &renderer,
         const std::vector<PhraseTubeFrame> &frames,
         float half_width,
-        float time_seconds )
+        float time_seconds,
+        float alpha )
     {
-        if( frames.size() < 2 || half_width <= 0.0f )
+        if( frames.size() < 2 || half_width <= 0.0f || alpha <= 0.0f )
         {
             return;
         }
@@ -98,11 +99,11 @@ namespace piko::modules::stage
             const rendering::Vec2 mid0 = frames[ i ].point;
             const rendering::Vec2 mid1 = frames[ i + 1 ].point;
 
-            const rendering::Color base0 =
-                sample_phrase_tube_fill_color( frames[ i ].distance, total_distance, time_seconds );
+            const rendering::Color base0 = rendering::scale_color_alpha(
+                sample_phrase_tube_fill_color( frames[ i ].distance, total_distance, time_seconds ), alpha );
 
-            const rendering::Color base1 =
-                sample_phrase_tube_fill_color( frames[ i + 1 ].distance, total_distance, time_seconds );
+            const rendering::Color base1 = rendering::scale_color_alpha(
+                sample_phrase_tube_fill_color( frames[ i + 1 ].distance, total_distance, time_seconds ), alpha );
 
             const rendering::Color edge0 =
                 rendering::scale_color_rgb( rendering::scale_color_alpha( base0, 0.92f ), 0.92f );
@@ -255,6 +256,11 @@ namespace piko::modules::stage
 
         alpha = std::clamp( alpha, 0.0f, 1.0f );
 
+        if( alpha <= 0.0f )
+        {
+            return;
+        }
+
         const float outer_radius =
             std::max( 1.0f, phrase_tube_outer_radius * phrase_tube_note_head_scale * dimension_scale );
 
@@ -296,7 +302,12 @@ namespace piko::modules::stage
     {
         const float dimension_scale = std::max( 0.25f, appearance.scale );
 
-        const float alpha = std::clamp( appearance.alpha, 0.0f, 1.0f );
+        const float alpha = std::clamp( appearance.alpha * appearance.tint.a, 0.0f, 1.0f );
+
+        if( alpha <= 0.0f )
+        {
+            return;
+        }
 
         const rendering::Vec2 stretched_center = apply_phrase_presentation_stretch( center,
             appearance.presentation.center,
@@ -338,7 +349,7 @@ namespace piko::modules::stage
                     appearance.tint.r,
                     appearance.tint.g,
                     appearance.tint.b,
-                    alpha * appearance.tint.a
+                    alpha
                 } );
 
             return;
@@ -355,13 +366,13 @@ namespace piko::modules::stage
                     std::clamp( appearance.tint.r * 1.08f + 0.04f, 0.0f, 1.0f ),
                     std::clamp( appearance.tint.g * 1.08f + 0.06f, 0.0f, 1.0f ),
                     std::clamp( appearance.tint.b * 1.08f + 0.04f, 0.0f, 1.0f ),
-                    alpha * appearance.tint.a * 0.48f
+                    alpha * 0.48f
                 },
                 rendering::Color{
                     std::clamp( appearance.tint.r * 0.94f + 0.04f, 0.0f, 1.0f ),
                     std::clamp( appearance.tint.g * 0.94f + 0.04f, 0.0f, 1.0f ),
                     std::clamp( appearance.tint.b * 0.94f + 0.02f, 0.0f, 1.0f ),
-                    alpha * appearance.tint.a * 0.90f
+                    alpha * 0.90f
                 },
                 40 );
             return;
@@ -679,8 +690,13 @@ namespace piko::modules::stage
         float time_seconds,
         bool draw_begin_head,
         bool draw_end_cap,
-        float dimension_scale )
+        float dimension_scale,
+        float note_alpha,
+        float body_alpha )
     {
+        note_alpha = std::clamp( note_alpha, 0.0f, 1.0f );
+        body_alpha = std::clamp( body_alpha, 0.0f, 1.0f );
+
         if( raw_points.empty() )
         {
             return;
@@ -700,7 +716,7 @@ namespace piko::modules::stage
         {
             if( draw_begin_head || draw_end_cap )
             {
-                draw_phrase_note_head( renderer, points.front(), time_seconds, dimension_scale );
+                draw_phrase_note_head( renderer, points.front(), time_seconds, dimension_scale, note_alpha );
             }
 
             return;
@@ -719,9 +735,9 @@ namespace piko::modules::stage
 
         const float glass_half_width = std::max( 1.0f, inner_radius * phrase_tube_glass_center_scale );
 
-        const rendering::Color soft_border{ 1.00f, 0.60f, 0.00f, 0.20f };
-        const rendering::Color border{ 1.00f, 0.74f, 0.00f, 1.00f };
-        const rendering::Color glass{ 1.00f, 0.96f, 0.72f, 0.11f };
+        const rendering::Color soft_border{ 1.00f, 0.60f, 0.00f, 0.20f * body_alpha };
+        const rendering::Color border{ 1.00f, 0.74f, 0.00f, body_alpha };
+        const rendering::Color glass{ 1.00f, 0.96f, 0.72f, 0.11f * body_alpha };
 
         const rendering::Vec2 cap_center = frames.back().point;
         const rendering::Vec2 cap_tangent = frames.back().tangent;
@@ -755,12 +771,13 @@ namespace piko::modules::stage
                 24 );
         }
 
-        draw_phrase_tube_fill_ribbon( renderer, frames, inner_radius, time_seconds );
+        draw_phrase_tube_fill_ribbon( renderer, frames, inner_radius, time_seconds, body_alpha );
 
         if( draw_end_cap )
         {
-            const rendering::Color cap_fill =
-                sample_phrase_tube_fill_color( frames.back().distance, frames.back().distance, time_seconds );
+            const rendering::Color cap_fill = rendering::scale_color_alpha(
+                sample_phrase_tube_fill_color( frames.back().distance, frames.back().distance, time_seconds ),
+                body_alpha );
 
             draw_phrase_tube_semidisc( renderer,
                 cap_center,
@@ -785,7 +802,7 @@ namespace piko::modules::stage
 
         if( draw_begin_head )
         {
-            draw_phrase_note_head( renderer, frames.front().point, time_seconds, dimension_scale );
+            draw_phrase_note_head( renderer, frames.front().point, time_seconds, dimension_scale, note_alpha );
         }
     }
 
@@ -897,8 +914,13 @@ namespace piko::modules::stage
     void draw_darkened_phrase_overlay( rendering::Renderer &renderer,
         const std::vector<rendering::Vec2> &raw_points,
         const runtime::stage::StageGameplayView &view,
-        bool draw_begin_icon )
+        bool draw_begin_icon,
+        float note_alpha,
+        float body_alpha )
     {
+        note_alpha = std::clamp( note_alpha, 0.0f, 1.0f );
+        body_alpha = std::clamp( body_alpha, 0.0f, 1.0f );
+
         if( raw_points.empty() )
         {
             return;
@@ -915,7 +937,7 @@ namespace piko::modules::stage
                 view.presentation_scale_y ) );
         }
 
-        if( points.size() >= 2 )
+        if( points.size() >= 2 && body_alpha > 0.0f )
         {
             const float dimension_scale = std::max( 0.25f, view.zoom ) * phrase_note_visual_scale;
 
@@ -924,28 +946,28 @@ namespace piko::modules::stage
                 renderer.draw_line( points[ i - 1 ],
                     points[ i ],
                     itfc_phrase_tube_height * dimension_scale * 1.05f,
-                    rendering::Color{ 0.015f, 0.055f, 0.16f, 0.78f } );
+                    rendering::Color{ 0.015f, 0.055f, 0.16f, 0.78f * body_alpha } );
 
                 renderer.draw_line( points[ i - 1 ],
                     points[ i ],
                     itfc_phrase_tube_height * dimension_scale * 0.46f,
-                    rendering::Color{ 0.05f, 0.18f, 0.40f, 0.72f } );
+                    rendering::Color{ 0.05f, 0.18f, 0.40f, 0.72f * body_alpha } );
             }
         }
 
-        if( draw_begin_icon && !points.empty() )
+        if( draw_begin_icon && !points.empty() && note_alpha > 0.0f )
         {
             const float dimension_scale = std::max( 0.25f, view.zoom ) * phrase_note_visual_scale;
             draw_filled_disc( renderer,
                 points.front(),
                 itfc_phrase_tube_height * 0.60f * dimension_scale,
-                rendering::Color{ 0.02f, 0.08f, 0.22f, 0.82f } );
+                rendering::Color{ 0.02f, 0.08f, 0.22f, 0.82f * note_alpha } );
 
             draw_disc_outline( renderer,
                 points.front(),
                 itfc_phrase_tube_height * 0.62f * dimension_scale,
                 2.5f,
-                rendering::Color{ 0.12f, 0.34f, 0.72f, 0.82f } );
+                rendering::Color{ 0.12f, 0.34f, 0.72f, 0.82f * note_alpha } );
         }
     }
 
@@ -1319,11 +1341,11 @@ namespace piko::modules::stage
             const bool darkened_phrase = phrase_group_is_darkened( group, visual_overrides );
             const bool held_phrase = phrase_group_is_held( group, visual_overrides );
             const rendering::Color phrase_note_tint =
-                darkened_phrase ? phrase_note_lost_tint()
+                darkened_phrase ? phrase_note_lost_tint( held_phrase ? custom_held_note_color.a : custom_note_color.a )
                                 : ( held_phrase ? custom_held_note_color : custom_note_color );
 
             const rendering::Color phrase_length_tint =
-                darkened_phrase ? phrase_note_lost_tint()
+                darkened_phrase ? phrase_note_lost_tint( held_phrase ? custom_held_note_color.a : custom_note_body_color.a )
                                 : ( held_phrase ? custom_held_note_color : custom_note_body_color );
 
             const bool use_gradient_pulse = phrase_tube_gradient_pulse_enabled && held_phrase && !darkened_phrase;
@@ -1454,13 +1476,20 @@ namespace piko::modules::stage
                         time_seconds,
                         draws_begin_icon,
                         draws_end_cap,
-                        dimension_scale );
+                        dimension_scale,
+                        phrase_note_tint.a,
+                        phrase_length_tint.a );
                 }
 
                 if( darkened_phrase && ( tube_texture == nullptr || !tube_texture->valid() ) &&
                     ( itfc_texture == nullptr || !itfc_texture->valid() ) )
                 {
-                    draw_darkened_phrase_overlay( renderer, phrase_points, view, draws_begin_icon );
+                    draw_darkened_phrase_overlay( renderer,
+                        phrase_points,
+                        view,
+                        draws_begin_icon,
+                        phrase_note_tint.a,
+                        phrase_length_tint.a );
                 }
             }
 

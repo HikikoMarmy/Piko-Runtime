@@ -382,29 +382,34 @@ namespace piko::modules
         return picker_rect( panel, 338.0f, 80.0f, 22.0f, 300.0f );
     }
 
+    rendering::Rect GameplayVisualModule::picker_alpha_rect( const rendering::Rect &panel )
+    {
+        return picker_rect( panel, 130.0f, 400.0f, 230.0f, 22.0f );
+    }
+
     rendering::Rect GameplayVisualModule::picker_code_rect( const rendering::Rect &panel )
     {
-        return picker_rect( panel, 24.0f, 396.0f, 224.0f, 36.0f );
+        return picker_rect( panel, 24.0f, 456.0f, 224.0f, 36.0f );
     }
 
     rendering::Rect GameplayVisualModule::picker_copy_rect( const rendering::Rect &panel )
     {
-        return picker_rect( panel, 268.0f, 396.0f, 96.0f, 36.0f );
+        return picker_rect( panel, 268.0f, 456.0f, 96.0f, 36.0f );
     }
 
     rendering::Rect GameplayVisualModule::picker_paste_rect( const rendering::Rect &panel )
     {
-        return picker_rect( panel, 374.0f, 396.0f, 102.0f, 36.0f );
+        return picker_rect( panel, 374.0f, 456.0f, 102.0f, 36.0f );
     }
 
     rendering::Rect GameplayVisualModule::picker_done_rect( const rendering::Rect &panel )
     {
-        return picker_rect( panel, 134.0f, 444.0f, 108.0f, 28.0f );
+        return picker_rect( panel, 134.0f, 504.0f, 108.0f, 28.0f );
     }
 
     rendering::Rect GameplayVisualModule::picker_cancel_rect( const rendering::Rect &panel )
     {
-        return picker_rect( panel, 258.0f, 444.0f, 108.0f, 28.0f );
+        return picker_rect( panel, 258.0f, 504.0f, 108.0f, 28.0f );
     }
 
     rendering::Rect GameplayVisualModule::picker_preset_rect( const rendering::Rect &panel, std::int32_t index )
@@ -469,9 +474,10 @@ namespace piko::modules
         const std::string &value,
         float pixel_height,
         TextStyle style,
-        TextEntry &entry )
+        TextEntry &entry,
+        std::optional<bool> selected_variant )
     {
-        constexpr float raster_scale = 3.0f;
+        const float raster_scale = style == TextStyle::Dynamic ? 1.5f : 3.0f;
         const float ui_scale =
             rendering::make_logical_viewport( last_output_width_, last_output_height_, 1280.0f, 720.0f ).scale;
 
@@ -493,11 +499,16 @@ namespace piko::modules
 
             entry.style = style;
 
-            entry.reusable = !value.empty() && value.front() != '#';
+            entry.reusable = style != TextStyle::Dynamic && !value.empty() && value.front() != '#';
         }
 
         for( bool selected : { false, true } )
         {
+            if( selected_variant && selected != *selected_variant )
+            {
+                continue;
+            }
+
             managers::TextureHandle &handle = selected ? entry.selected : entry.normal;
 
             if( !handle && title_font_.loaded() )
@@ -515,6 +526,7 @@ namespace piko::modules
 
                 if( !handle )
                 {
+                    const bool row_like = style == TextStyle::Row || style == TextStyle::Dynamic;
                     const rendering::Color face = style == TextStyle::Section ? rendering::color_from_rgb( 0x8E2943u )
                                                   : style == TextStyle::Heading
                                                       ? rendering::color_from_rgb( 0xEFBB4Bu )
@@ -523,13 +535,15 @@ namespace piko::modules
                     const rendering::StrokedTextStyle text_style{
                         face,
                         rendering::color_from_rgb(
-                            style == TextStyle::Section || ( style == TextStyle::Row && selected ) ? 0xFEF67Au
+                            style == TextStyle::Section || ( row_like && selected ) ? 0xFEF67Au
                                                                                                    : 0x0D005Au ),
                         rendering::color_from_rgb(
-                            style == TextStyle::Section || ( style == TextStyle::Row && selected ) ? 0xFFC2FAu
+                            style == TextStyle::Section || ( row_like && selected ) ? 0xFFC2FAu
                                                                                                    : 0x4287DDu ),
-                        std::max( 1, static_cast<std::int32_t>( std::lround( 8.0f * ui_scale ) ) ),
-                        std::max( 1, static_cast<std::int32_t>( std::lround( 17.0f * ui_scale ) ) ),
+                        std::max( 1, static_cast<std::int32_t>( std::lround(
+                            ( style == TextStyle::Dynamic ? 4.0f : 8.0f ) * ui_scale ) ) ),
+                        std::max( 1, static_cast<std::int32_t>( std::lround(
+                            ( style == TextStyle::Dynamic ? 8.0f : 17.0f ) * ui_scale ) ) ),
                         1.5f
                     };
 
@@ -589,8 +603,8 @@ namespace piko::modules
         float maximum_width,
         bool centered )
     {
-        constexpr float raster_scale = 3.0f;
-        prepare_text( app, value, pixel_height, style, entry );
+        const float raster_scale = style == TextStyle::Dynamic ? 1.5f : 3.0f;
+        prepare_text( app, value, pixel_height, style, entry, selected );
         const managers::TextureHandle handle = selected ? entry.selected : entry.normal;
 
         if( const rendering::Texture *texture = app.texture_manager().get( handle ) )
@@ -2852,7 +2866,7 @@ namespace piko::modules
 
         picker_value_ = hsv[ 2 ];
 
-        picker_alpha_ = color[ 3 ];
+        picker_alpha_ = std::clamp( color[ 3 ], 0.0f, 1.0f );
 
         if( auto *target = target_color( app ) )
         {
@@ -2909,6 +2923,23 @@ namespace piko::modules
 
     void GameplayVisualModule::handle_picker_event( App &app, const SDL_Event &event )
     {
+        const auto cycle_picker_focus = [ & ]()
+        {
+            if( picker_hue_focused_ )
+            {
+                picker_hue_focused_ = false;
+                picker_alpha_focused_ = true;
+            }
+            else if( picker_alpha_focused_ )
+            {
+                picker_alpha_focused_ = false;
+            }
+            else
+            {
+                picker_hue_focused_ = true;
+            }
+        };
+
         if( event.type == SDL_EVENT_TEXT_INPUT && picker_code_focused_ )
         {
             std::string text = picker_code_selected_ ? std::string{} : picker_hex_text_;
@@ -2946,7 +2977,13 @@ namespace piko::modules
 
         if( event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN )
         {
-            if( event.gbutton.button == SDL_GAMEPAD_BUTTON_LEFT_SHOULDER )
+            if( event.gbutton.button == SDL_GAMEPAD_BUTTON_NORTH )
+            {
+                focus_picker_code( app, false );
+                cycle_picker_focus();
+                picker_key_consumed_ = true;
+            }
+            else if( event.gbutton.button == SDL_GAMEPAD_BUTTON_LEFT_SHOULDER )
             {
                 hue_direction = -1;
             }
@@ -2998,7 +3035,8 @@ namespace piko::modules
             }
             else if( event.key.key == SDLK_TAB )
             {
-                picker_hue_focused_ = !picker_hue_focused_;
+                cycle_picker_focus();
+                picker_key_consumed_ = true;
             }
             else if( event.key.key == SDLK_PAGEUP || event.key.key == SDLK_PAGEDOWN )
             {
@@ -3030,6 +3068,7 @@ namespace piko::modules
             picker_key_consumed_ = false;
 
             picker_hue_focused_ = false;
+            picker_alpha_focused_ = false;
 
             picker_drag_ = PickerDrag::None;
         }
@@ -3079,6 +3118,7 @@ namespace piko::modules
         const auto sv = picker_sv_rect( panel );
 
         const auto hue = picker_hue_rect( panel );
+        const auto alpha = picker_alpha_rect( panel );
         const bool key_consumed = std::exchange( picker_key_consumed_, false );
 
         if( mouse.left_clicked )
@@ -3146,12 +3186,20 @@ namespace piko::modules
                 picker_drag_ = PickerDrag::SaturationValue;
 
                 picker_hue_focused_ = false;
+                picker_alpha_focused_ = false;
             }
             else if( rendering::point_inside( hue, mouse.x, mouse.y ) )
             {
                 picker_drag_ = PickerDrag::Hue;
 
                 picker_hue_focused_ = true;
+                picker_alpha_focused_ = false;
+            }
+            else if( rendering::point_inside( alpha, mouse.x, mouse.y ) )
+            {
+                picker_drag_ = PickerDrag::Alpha;
+                picker_hue_focused_ = false;
+                picker_alpha_focused_ = true;
             }
         }
 
@@ -3172,6 +3220,11 @@ namespace piko::modules
             picker_hue_ = std::clamp( ( mouse.y - hue.y ) / hue.h, 0.0f, 1.0f );
             apply_picker_color( app );
         }
+        else if( picker_drag_ == PickerDrag::Alpha )
+        {
+            picker_alpha_ = std::clamp( ( mouse.x - alpha.x ) / alpha.w, 0.0f, 1.0f );
+            apply_picker_color( app );
+        }
 
         if( !picker_code_focused_ && !key_consumed )
         {
@@ -3183,7 +3236,11 @@ namespace piko::modules
 
             if( horizontal != 0.0f || vertical != 0.0f )
             {
-                if( picker_hue_focused_ )
+                if( picker_alpha_focused_ )
+                {
+                    picker_alpha_ = std::clamp( picker_alpha_ + horizontal * 0.01f, 0.0f, 1.0f );
+                }
+                else if( picker_hue_focused_ )
                 {
                     picker_hue_ += ( horizontal - vertical ) / 180.0f;
 
@@ -3374,7 +3431,10 @@ namespace piko::modules
 
         const float text_scale = layout.scale;
         const float heading_scale = layout.scale;
-        prepare_row_text( app, text_scale );
+        if( color_target_ == ColorTarget::None )
+        {
+            prepare_row_text( app, text_scale );
+        }
 
         presentation_->draw( app, renderer );
 
@@ -3679,6 +3739,7 @@ namespace piko::modules
         const float picker_scale = picker.w / picker_width;
         const rendering::Rect sv = picker_sv_rect( picker );
         const rendering::Rect hue = picker_hue_rect( picker );
+        const rendering::Rect alpha = picker_alpha_rect( picker );
 
         renderer.draw_filled_rect(
             rendering::Rect{
@@ -3784,9 +3845,82 @@ namespace piko::modules
         renderer.draw_filled_rect( rendering::Rect{ hue.x - 3.0f, hue_marker_y - 2.0f, hue.w + 6.0f, 4.0f },
             rendering::Color{ 1.0f, 1.0f, 1.0f, 1.0f } );
 
+        draw_stroked_text
+        (
+            app,
+            renderer,
+            localization::text( "@ui.alpha" ),
+            picker.x + 24.0f * picker_scale,
+            alpha.y + alpha.h * 0.5f,
+            17.0f * picker_scale,
+            picker_alpha_focused_,
+            picker_text_[ 7 ],
+            false,
+            TextStyle::Row,
+            100.0f * picker_scale
+        );
+
+        renderer.draw_filled_rect
+        (
+            rendering::Rect
+            {
+                alpha.x - 2.0f * picker_scale,
+                alpha.y - 2.0f * picker_scale,
+                alpha.w + 4.0f * picker_scale,
+                alpha.h + 4.0f * picker_scale
+            },
+            picker_alpha_focused_ ? rendering::menu_theme::focus_accent
+                                  : rendering::Color{ 0.30f, 0.38f, 0.56f, 1.0f }
+        );
+
+        draw_checkerboard( renderer, alpha, 8.0f * picker_scale );
+
+        const rendering::Color opaque = hsv_to_color( picker_hue_, picker_saturation_, picker_value_ );
+        vertices.clear();
+
+        push_quad( vertices,
+            alpha,
+            rendering::Color{ opaque.r, opaque.g, opaque.b, 0.0f },
+            rendering::Color{ opaque.r, opaque.g, opaque.b, 1.0f },
+            rendering::Color{ opaque.r, opaque.g, opaque.b, 1.0f },
+            rendering::Color{ opaque.r, opaque.g, opaque.b, 0.0f } );
+
+        renderer.draw_colored_triangles( vertices.data(), vertices.size() );
+
+        const float alpha_marker_x = alpha.x + picker_alpha_ * alpha.w;
+        renderer.draw_filled_rect
+        (
+            rendering::Rect
+            {
+                alpha_marker_x - 2.0f * picker_scale,
+                alpha.y - 3.0f * picker_scale,
+                4.0f * picker_scale,
+                alpha.h + 6.0f * picker_scale
+            },
+            rendering::Color{ 1.0f, 1.0f, 1.0f, 1.0f }
+        );
+
+        char alpha_percent[ 8 ]{};
+        std::snprintf( alpha_percent, sizeof( alpha_percent ), "%d%%", static_cast<std::int32_t>( std::lround( picker_alpha_ * 100.0f ) ) );
+
+        draw_stroked_text
+        (
+            app,
+            renderer,
+            alpha_percent,
+            picker.x + 420.0f * picker_scale,
+            alpha.y + alpha.h * 0.5f,
+            17.0f * picker_scale,
+            picker_alpha_focused_,
+            picker_text_[ 8 ],
+            true,
+            TextStyle::Dynamic,
+            52.0f * picker_scale
+        );
+
         const auto code = picker_code_rect( picker );
 
-        const auto current_swatch = picker_rect( picker, 28.0f, 400.0f, 28.0f, 28.0f );
+        const auto current_swatch = picker_rect( picker, 28.0f, 460.0f, 28.0f, 28.0f );
 
         const auto code_border =
             picker_hex_valid_ ? rendering::menu_theme::focus_accent : rendering::Color{ 1.0f, 0.30f, 0.30f, 1.0f };
@@ -3814,7 +3948,7 @@ namespace piko::modules
             false,
             picker_text_[ 1 ],
             false,
-            TextStyle::Row,
+            TextStyle::Dynamic,
             code.w - 52.0f * picker_scale );
 
         draw_stroked_text( app,

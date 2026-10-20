@@ -158,7 +158,8 @@ namespace piko::modules
         {
             None,
             SaturationValue,
-            Hue
+            Hue,
+            Alpha
         };
 
         struct PreviewTraceLine;
@@ -167,7 +168,8 @@ namespace piko::modules
         {
             Row,
             Heading,
-            Section
+            Section,
+            Dynamic
         };
 
         static constexpr float panel_margin = 34.0f;
@@ -180,7 +182,7 @@ namespace piko::modules
         static constexpr float preview_heading_height = 16.0f;
         static constexpr float preview_heading_margin = 8.0f;
         static constexpr float picker_width = 500.0f;
-        static constexpr float picker_height = 480.0f;
+        static constexpr float picker_height = 540.0f;
         static constexpr float tau = 6.28318530717958647692f;
         static constexpr std::array<std::array<float, 4>, 8> picker_presets{
             {
@@ -231,6 +233,7 @@ namespace piko::modules
         [[nodiscard]] static rendering::Rect picker_panel( std::int32_t output_width, std::int32_t output_height );
         [[nodiscard]] static rendering::Rect picker_sv_rect( const rendering::Rect &panel );
         [[nodiscard]] static rendering::Rect picker_hue_rect( const rendering::Rect &panel );
+        [[nodiscard]] static rendering::Rect picker_alpha_rect( const rendering::Rect &panel );
         [[nodiscard]] static rendering::Rect picker_rect( const rendering::Rect &panel,
             float x,
             float y,
@@ -250,7 +253,12 @@ namespace piko::modules
             TextStyle style,
             bool selected );
 
-        void prepare_text( App &app, const std::string &text, float pixel_height, TextStyle style, TextEntry &entry );
+        void prepare_text( App &app,
+            const std::string &text,
+            float pixel_height,
+            TextStyle style,
+            TextEntry &entry,
+            std::optional<bool> selected_variant = std::nullopt );
         void prepare_row_text( App &app, float text_scale );
 
         float draw_stroked_text( App &app,
@@ -361,7 +369,7 @@ namespace piko::modules
         };
 
         std::array<TextEntry, 5> heading_text_{};
-        std::array<TextEntry, 7> picker_text_{};
+        std::array<TextEntry, 9> picker_text_{};
         View view_ = View::Menu;
         View font_return_view_ = View::Menu;
         managers::InterfaceFont font_target_ = managers::InterfaceFont::Menu;
@@ -393,6 +401,7 @@ namespace piko::modules
         bool picker_hex_valid_ = true;
         bool picker_key_consumed_ = false;
         bool picker_hue_focused_ = false;
+        bool picker_alpha_focused_ = false;
         float picker_hue_ = 0.0f;
         float picker_saturation_ = 0.0f;
         float picker_value_ = 1.0f;
