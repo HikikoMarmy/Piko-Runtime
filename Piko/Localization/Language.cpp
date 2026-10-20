@@ -26,6 +26,7 @@ namespace piko::localization
         Value styles;
         managers::InterfaceStyle interface_style;
         std::string active_id = "EN";
+        bool active_right_to_left = false;
         std::uint32_t catalog_revision = 0;
 
         bool valid_id( std::string_view id )
@@ -174,6 +175,27 @@ namespace piko::localization
 
             read_strings( selected, next_strings );
 
+            bool next_right_to_left = false;
+            const auto read_direction = [ &next_right_to_left ]( const Value &catalog )
+            {
+                if( const Value *direction = catalog.find( "direction" ); direction != nullptr )
+                {
+                    if( !direction->is_string() ||
+                        ( direction->string() != "ltr" && direction->string() != "rtl" ) )
+                    {
+                        throw std::runtime_error( "Language direction must be 'ltr' or 'rtl'" );
+                    }
+                    next_right_to_left = direction->string() == "rtl";
+                }
+            };
+
+            read_direction( english );
+            for( auto entry = fallback_catalogs.rbegin(); entry != fallback_catalogs.rend(); ++entry )
+            {
+                read_direction( *entry );
+            }
+            read_direction( selected );
+
             std::vector<LanguageInfo> next_languages;
 
             for( const auto &file : std::filesystem::directory_iterator( directory ) )
@@ -314,6 +336,7 @@ namespace piko::localization
             styles = std::move( next_styles );
 
             active_id = next_id;
+            active_right_to_left = next_right_to_left;
 
             interface_style = {};
             ++catalog_revision;
@@ -390,6 +413,11 @@ namespace piko::localization
     const std::string &language_id()
     {
         return active_id;
+    }
+
+    bool right_to_left()
+    {
+        return active_right_to_left;
     }
 
     std::uint32_t revision()

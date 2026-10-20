@@ -3,6 +3,11 @@
 
 #include "Utils/MathUtil.hpp"
 
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <usp10.h>
+
 #define STBTT_STATIC
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <imstb_truetype.h>
@@ -11,12 +16,54 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <fstream>
 #include <limits>
+#include <string>
 #include <utility>
 
 namespace piko::rendering
 {
+    namespace
+    {
+        bool is_rtl_script( std::int32_t codepoint )
+        {
+            return ( codepoint >= 0x0590 && codepoint <= 0x08FF ) ||
+                   ( codepoint >= 0xFB1D && codepoint <= 0xFEFF ) ||
+                   ( codepoint >= 0x10800 && codepoint <= 0x10FFF ) ||
+                   ( codepoint >= 0x1E800 && codepoint <= 0x1EEFF );
+        }
+
+        std::wstring gdi_family_name( const stbtt_fontinfo &font )
+        {
+            for( const int name_id : { 16, 1 } )
+            {
+                for( const int encoding : { 1, 10 } )
+                {
+                    int length = 0;
+                    const char *name = stbtt_GetFontNameString( &font, &length, 3, encoding, 0x409, name_id );
+                    if( name == nullptr || length < 2 || ( length & 1 ) != 0 )
+                    {
+                        continue;
+                    }
+
+                    std::wstring family;
+                    for( int index = 0; index < length; index += 2 )
+                    {
+                        const auto high = static_cast<unsigned char>( name[ index ] );
+                        const auto low = static_cast<unsigned char>( name[ index + 1 ] );
+                        family.push_back( static_cast<wchar_t>( ( high << 8u ) | low ) );
+                    }
+                    if( !family.empty() && family.size() < LF_FACESIZE )
+                    {
+                        return family;
+                    }
+                }
+            }
+            return L"Segoe UI";
+        }
+    }
+
     bool RasterizedText::valid() const
     {
         return width > 0 && height > 0 &&
@@ -204,6 +251,17 @@ namespace piko::rendering
             std::filesystem::path path;
             std::vector<std::uint8_t> bytes;
             stbtt_fontinfo font{};
+            std::wstring gdi_family;
+            bool gdi_registered = false;
+            bool gdi_registration_attempted = false;
+
+            ~Face()
+            {
+                if( gdi_registered )
+                {
+                    RemoveFontResourceExW( path.c_str(), FR_PRIVATE, nullptr );
+                }
+            }
         };
 
         std::vector<std::unique_ptr<Face>> faces;
@@ -339,6 +397,8 @@ namespace piko::rendering
             return false;
         }
 
+        face->gdi_family = gdi_family_name( face->font );
+
         impl_->faces.push_back( std::move( face ) );
 
         if( error != nullptr )
@@ -406,6 +466,44 @@ namespace piko::rendering
         {
             set_error( error, "Text and pixel height must be non-empty" );
             return output;
+        }
+
+        bool has_rtl_script = false;
+        bool first_strong_rtl = false;
+        bool found_strong = false;
+
+        for( std::size_t offset = 0; offset < text.size(); )
+        {
+            std::int32_t codepoint = 0;
+
+            if( !decode_utf8_codepoint( text, offset, codepoint ) )
+                break;
+
+            if( is_rtl_script( codepoint ) )
+            {
+                has_rtl_script = true;
+
+                if( !found_strong )
+                {
+                    first_strong_rtl = true;
+                    found_strong = true;
+                }
+            }
+            else if( !found_strong && ( ( codepoint >= 'A' && codepoint <= 'Z' ) ||
+                                        ( codepoint >= 'a' && codepoint <= 'z' ) ) )
+            {
+                found_strong = true;
+            }
+        }
+
+        if( localization::right_to_left() || has_rtl_script )
+        {
+            return rasterize_shaped
+            (
+                text, pixel_height, style,
+                found_strong ? first_strong_rtl : localization::right_to_left(),
+                error
+            );
         }
 
         const std::int32_t inner_radius = std::max( style.inner_border_pixels, 0 );
@@ -589,6 +687,25 @@ namespace piko::rendering
             stbtt_FreeBitmap( glyph, nullptr );
         }
 
+        if( error != nullptr )
+        {
+            error->clear();
+        }
+        return compose_stroked( output.width, output.height, fill_mask, fill_colors, style );
+    }
+
+    RasterizedText TrueTypeFont::compose_stroked( std::int32_t width,
+        std::int32_t height,
+        const std::vector<std::uint8_t> &fill_mask,
+        const std::vector<Color> &fill_colors,
+        const StrokedTextStyle &style )
+    {
+        RasterizedText output{};
+        output.width = width;
+        output.height = height;
+        const std::int32_t inner_radius = std::max( style.inner_border_pixels, 0 );
+        const std::int32_t outer_radius = std::max( style.outer_border_pixels, inner_radius );
+
         const std::vector<std::uint8_t> inner_mask =
             dilate_mask( fill_mask, output.width, output.height, inner_radius );
 
@@ -640,11 +757,225 @@ namespace piko::rendering
             }
         }
 
+        return output;
+    }
+
+    RasterizedText TrueTypeFont::rasterize_shaped(
+        std::string_view text,
+        float pixel_height,
+        const StrokedTextStyle &style,
+        bool rtl_base,
+        std::string *error ) const
+    {
+        RasterizedText empty{};
+        std::wstring wide;
+        std::size_t face_index = 0;
+        bool found_script_face = false;
+
+        for( std::size_t offset = 0; offset < text.size(); )
+        {
+            std::int32_t codepoint = 0;
+            if( !decode_utf8_codepoint( text, offset, codepoint ) )
+            {
+                break;
+            }
+
+            if( codepoint == '\n' || codepoint == '\r' )
+            {
+                codepoint = ' ';
+            }
+
+            if( !found_script_face && is_rtl_script( codepoint ) )
+            {
+                const std::size_t candidate = impl_->face_index( codepoint );
+
+                if( stbtt_FindGlyphIndex( &impl_->faces[ candidate ]->font, codepoint ) != 0 )
+                {
+                    face_index = candidate;
+                    found_script_face = true;
+                }
+            }
+
+            if( codepoint <= 0xFFFF )
+            {
+                wide.push_back( static_cast<wchar_t>( codepoint ) );
+            }
+            else
+            {
+                codepoint -= 0x10000;
+                wide.push_back( static_cast<wchar_t>( 0xD800 + ( codepoint >> 10 ) ) );
+                wide.push_back( static_cast<wchar_t>( 0xDC00 + ( codepoint & 0x3FF ) ) );
+            }
+        }
+
+        if( wide.empty() || wide.size() > 4096 )
+        {
+            set_error( error, "RTL text is empty or too long" );
+            return empty;
+        }
+
+        auto &selected_face = *impl_->faces[ face_index ];
+        if( !selected_face.gdi_registration_attempted )
+        {
+            selected_face.gdi_registered =
+                AddFontResourceExW( selected_face.path.c_str(), FR_PRIVATE, nullptr ) > 0;
+            selected_face.gdi_registration_attempted = true;
+        }
+
+        struct GdiScope
+        {
+            HDC dc = nullptr;
+            HFONT font = nullptr;
+            HGDIOBJ old_font = nullptr;
+            HBITMAP bitmap = nullptr;
+            HGDIOBJ old_bitmap = nullptr;
+            SCRIPT_STRING_ANALYSIS analysis = nullptr;
+
+            ~GdiScope()
+            {
+                if( analysis != nullptr ) ScriptStringFree( &analysis );
+                if( old_bitmap != nullptr ) SelectObject( dc, old_bitmap );
+                if( bitmap != nullptr ) DeleteObject( bitmap );
+                if( old_font != nullptr ) SelectObject( dc, old_font );
+                if( font != nullptr ) DeleteObject( font );
+                if( dc != nullptr ) DeleteDC( dc );
+            }
+        } gdi;
+
+        gdi.dc = CreateCompatibleDC( nullptr );
+        if( gdi.dc == nullptr )
+        {
+            set_error( error, "Could not create RTL text device context" );
+            return empty;
+        }
+
+        LOGFONTW logical_font{};
+        logical_font.lfHeight = -std::max( 1l, std::lround( pixel_height ) );
+        logical_font.lfCharSet = DEFAULT_CHARSET;
+        logical_font.lfQuality = ANTIALIASED_QUALITY;
+        const auto &family = selected_face.gdi_family;
+        std::copy_n( family.begin(), std::min( family.size(), std::size( logical_font.lfFaceName ) - 1u ),
+            logical_font.lfFaceName );
+        gdi.font = CreateFontIndirectW( &logical_font );
+        if( gdi.font == nullptr )
+        {
+            set_error( error, "Could not create RTL font" );
+            return empty;
+        }
+        gdi.old_font = SelectObject( gdi.dc, gdi.font );
+
+        const HRESULT analysed = ScriptStringAnalyse( gdi.dc,
+            wide.data(),
+            static_cast<int>( wide.size() ),
+            static_cast<int>( wide.size() * 2u + 16u ),
+            -1,
+            SSA_GLYPHS | SSA_FALLBACK | SSA_LINK | ( rtl_base ? SSA_RTL : 0 ),
+            0,
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr,
+            &gdi.analysis );
+
+        if( analysed != S_OK )
+        {
+            set_error( error, "Could not shape RTL text" );
+            return empty;
+        }
+
+        const SIZE *size = ScriptString_pSize( gdi.analysis );
+        if( size == nullptr || size->cx <= 0 || size->cy <= 0 )
+        {
+            set_error( error, "RTL text produced no visible glyphs" );
+            return empty;
+        }
+
+        const int margin = std::max( style.outer_border_pixels, 0 ) + 16;
+        const int bitmap_width = size->cx + margin * 2;
+        const int bitmap_height = std::max( static_cast<int>( size->cy ), static_cast<int>( std::ceil( pixel_height ) ) ) + margin * 2;
+        BITMAPINFO bitmap_info{};
+        bitmap_info.bmiHeader.biSize = sizeof( BITMAPINFOHEADER );
+        bitmap_info.bmiHeader.biWidth = bitmap_width;
+        bitmap_info.bmiHeader.biHeight = -bitmap_height;
+        bitmap_info.bmiHeader.biPlanes = 1;
+        bitmap_info.bmiHeader.biBitCount = 32;
+        bitmap_info.bmiHeader.biCompression = BI_RGB;
+        void *bits = nullptr;
+        gdi.bitmap = CreateDIBSection( gdi.dc, &bitmap_info, DIB_RGB_COLORS, &bits, nullptr, 0 );
+
+        if( gdi.bitmap == nullptr || bits == nullptr )
+        {
+            set_error( error, "Could not create RTL text bitmap" );
+            return empty;
+        }
+
+        gdi.old_bitmap = SelectObject( gdi.dc, gdi.bitmap );
+        std::memset( bits, 0, static_cast<std::size_t>( bitmap_width ) * bitmap_height * 4u );
+        SetBkMode( gdi.dc, TRANSPARENT );
+        SetTextColor( gdi.dc, RGB( 255, 255, 255 ) );
+        SetTextAlign( gdi.dc, TA_LEFT | TA_TOP | TA_NOUPDATECP );
+
+        if( ScriptStringOut( gdi.analysis, margin, margin, 0, nullptr, 0, 0, FALSE ) != S_OK )
+        {
+            set_error( error, "Could not draw RTL text" );
+            return empty;
+        }
+
+        const auto *pixels = static_cast<const std::uint8_t *>( bits );
+        int min_x = bitmap_width;
+        int min_y = bitmap_height;
+        int max_x = -1;
+        int max_y = -1;
+
+        for( int y = 0; y < bitmap_height; ++y )
+        {
+            for( int x = 0; x < bitmap_width; ++x )
+            {
+                const std::size_t pixel = ( static_cast<std::size_t>( y ) * bitmap_width + x ) * 4u;
+                if( pixels[ pixel ] != 0 || pixels[ pixel + 1u ] != 0 || pixels[ pixel + 2u ] != 0 )
+                {
+                    min_x = std::min( min_x, x );
+                    min_y = std::min( min_y, y );
+                    max_x = std::max( max_x, x );
+                    max_y = std::max( max_y, y );
+                }
+            }
+        }
+
+        if( max_x < min_x || max_y < min_y )
+        {
+            set_error( error, "RTL text produced no visible glyphs" );
+            return empty;
+        }
+
+        const int padding = std::max( style.outer_border_pixels, std::max( style.inner_border_pixels, 0 ) ) + 2;
+        const int output_width = max_x - min_x + 1 + padding * 2;
+        const int output_height = max_y - min_y + 1 + padding * 2;
+        std::vector<std::uint8_t> fill_mask( static_cast<std::size_t>( output_width ) * output_height, 0u );
+
+        for( int y = min_y; y <= max_y; ++y )
+        {
+            for( int x = min_x; x <= max_x; ++x )
+            {
+                const std::size_t source = ( static_cast<std::size_t>( y ) * bitmap_width + x ) * 4u;
+                const std::size_t destination =
+                    static_cast<std::size_t>( y - min_y + padding ) * output_width + ( x - min_x + padding );
+                fill_mask[ destination ] = std::max( { pixels[ source ], pixels[ source + 1u ], pixels[ source + 2u ] } );
+            }
+        }
+
+        std::vector<Color> fill_colors;
+        if( !style.glyph_fill_colors.empty() )
+        {
+            fill_colors.resize( fill_mask.size(), style.glyph_fill_colors.front() );
+        }
+
         if( error != nullptr )
         {
             error->clear();
         }
 
-        return output;
+        return compose_stroked( output_width, output_height, fill_mask, fill_colors, style );
     }
 }

@@ -43,6 +43,7 @@ namespace piko::localization
 
     [[nodiscard]] const std::vector<LanguageInfo> &languages();
     [[nodiscard]] const std::string &language_id();
+    [[nodiscard]] bool right_to_left();
     [[nodiscard]] std::uint32_t revision();
     [[nodiscard]] std::string texture_key( std::string_view name );
     [[nodiscard]] std::filesystem::path font_path( const std::filesystem::path &original = {} );

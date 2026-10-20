@@ -59,6 +59,18 @@ namespace piko::rendering
         struct Impl;
 
         bool load_face( const std::filesystem::path &path, std::string *error );
+        [[nodiscard]] RasterizedText rasterize_shaped(
+            std::string_view text,
+            float pixel_height,
+            const StrokedTextStyle &style,
+            bool rtl_base,
+            std::string *error ) const;
+        [[nodiscard]] static RasterizedText compose_stroked(
+            std::int32_t width,
+            std::int32_t height,
+            const std::vector<std::uint8_t> &fill_mask,
+            const std::vector<Color> &fill_colors,
+            const StrokedTextStyle &style );
 
         static void set_error( std::string *error, std::string message );
         static bool decode_utf8_codepoint( std::string_view text, std::size_t &offset, std::int32_t &codepoint );
